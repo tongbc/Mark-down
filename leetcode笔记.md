@@ -1228,3 +1228,93 @@ class Solution(object):
         return sum
 ```
 
+## 467.环绕字符串中唯一的子字符串
+
+### 题目描述
+
+把字符串 s 看作是“abcdefghijklmnopqrstuvwxyz”的无限环绕字符串，所以 s 看起来是这样的："...zabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcd....". 
+
+现在我们有了另一个字符串 p 。你需要的是找出 s 中有多少个唯一的 p 的非空子串，尤其是当你的输入是字符串 p ，你需要输出字符串 s 中 p 的不同的非空子串的数目。 
+
+注意: p 仅由小写的英文字母组成，p 的大小可能超过 10000。
+
+ 
+
+示例 1:
+
+输入: "a"
+输出: 1
+解释: 字符串 S 中只有一个"a"子字符。
+
+示例 2:
+
+输入: "cac"
+输出: 2
+解释: 字符串 S 中的字符串“cac”只有两个子串“a”、“c”。.
+
+
+示例 3:
+
+输入: "zab"
+输出: 6
+解释: 在字符串 S 中有六个子串“z”、“a”、“b”、“za”、“ab”、“zab”。.
+
+### 解题思路
+
+动态规划问题：用字典记录，以每个字母结尾的最长连续数组的排列，连续的话就加一，不连续回归1，所有的相加最后得出结果。
+
+### tag
+
+dp
+
+```python
+class Solution:
+    def findSubstringInWraproundString(self, p: str) -> int:
+        res = {i:1 for i in p}
+        l  =1
+        for i,j in zip(p,p[1:]):
+            l = l+1 if (ord(j)-ord(i))%26==1 else 1
+            res[j] = max(res[j],l)
+        return sum(res.values())
+```
+
+## 797.所有可能的路径
+
+### 题目描述
+
+给一个有 n 个结点的有向无环图，找到所有从 0 到 n-1 的路径并输出（不要求按顺序）
+
+二维数组的第 i 个数组中的单元都表示有向图中 i 号结点所能到达的下一些结点（译者注：有向图是有方向的，即规定了a→b你就不能从b→a）空就是没有下一个结点了。
+
+示例:
+输入: [[1,2], [3], [3], []] 
+输出: [[0,1,3],[0,2,3]] 
+解释: 图是这样的:
+0--->1
+|    |
+v    v
+2--->3
+这有两条路: 0 -> 1 -> 3 和 0 -> 2 -> 3.
+
+### 解题思路
+
+dfs,无环，确定开头与结尾，so easy
+
+### tag
+
+dfs
+
+```python
+class Solution(object):
+    def numberOfArithmeticSlices(self, A):
+        curr, sum = 0, 0
+        for i in range(2,len(A)):
+            if A[i]-A[i-1] == A[i-1]-A[i-2]:
+                curr += 1
+                sum += curr
+            else:
+                curr = 0
+        return sum
+```
+
+## 

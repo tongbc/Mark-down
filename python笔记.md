@@ -114,3 +114,33 @@ with multiprocessing.Pool() as pool:
 targets = collections.defaultdict(list)
 ```
 初始化字典value为list
+
+#### df.target.value_counts() 用法
+
+```python
+df = pd.DataFrame([["a1",5],["a2",6]],columns=["a","b"])
+df.b.value_counts()
+
+6    1
+5    1
+```
+
+#### np.argsort(lis) 用法
+
+从小到大返回index
+
+```python
+lis = [2,3,1]
+np.argsort(lis)[::-1]
+
+array([1, 0, 2])
+```
+
+#### sns.barplot
+
+
+
+```py
+sns.barplot(y=mark, x=x, orient='h')
+
+```
