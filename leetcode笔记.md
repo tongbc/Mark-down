@@ -1317,4 +1317,114 @@ class Solution(object):
         return sum
 ```
 
-## 
+## 752.打开转盘锁
+
+### 题目描述
+
+你有一个带有四个圆形拨轮的转盘锁。每个拨轮都有10个数字： '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' 。每个拨轮可以自由旋转：例如把 '9' 变为  '0'，'0' 变为 '9' 。每次旋转都只能旋转一个拨轮的一位数字。
+
+锁的初始数字为 '0000' ，一个代表四个拨轮的数字的字符串。
+
+列表 deadends 包含了一组死亡数字，一旦拨轮的数字和列表里的任何一个元素相同，这个锁将会被永久锁定，无法再被旋转。
+
+字符串 target 代表可以解锁的数字，你需要给出最小的旋转次数，如果无论如何不能解锁，返回 -1。
+
+ 
+
+示例 1:
+
+输入：deadends = ["0201","0101","0102","1212","2002"], target = "0202"
+输出：6
+解释：
+可能的移动序列为 "0000" -> "1000" -> "1100" -> "1200" -> "1201" -> "1202" -> "0202"。
+注意 "0000" -> "0001" -> "0002" -> "0102" -> "0202" 这样的序列是不能解锁的，
+因为当拨动到 "0102" 时这个锁就会被锁定。
+
+### 解题思路
+
+BFS，把所有能走没走过的路遍历，bfs，走过的路加入deadend，
+
+### tag
+
+BFS
+
+```python
+class Solution(object):
+    def openLock(self, deadends, target):
+        """
+        :type deadends: List[str]
+        :type target: str
+        :rtype: int
+        """
+        moved, q, cnt, move = set(deadends), ["0000"], 0, {str(i): [str((i + 1) % 10), str((i - 1) % 10)] for i in range(10)}
+
+        if "0000" in moved:
+            return -1
+        while q:
+            new = []
+            cnt+=1
+            for s in q:
+                for i,c in enumerate(s):
+                    for cur in (s[:i]+move[c][0]+s[i+1:],s[:i]+move[c][1]+s[i+1:]):
+                        if cur not in moved:
+                            if cur == target:
+                                return cnt
+                            else:
+                                new.append(cur)
+                                moved.add(cur)
+            q = new
+        return -1
+```
+
+## 795.区间子数组个数
+
+### 题目描述
+
+给定一个元素都是正整数的数组A ，正整数 L 以及 R (L <= R)。
+
+求连续、非空且其中最大元素满足大于等于L 小于等于R的子数组个数。
+
+例如 :
+输入: 
+A = [2, 1, 4, 3]
+L = 2
+R = 3
+输出: 3
+解释: 满足条件的子数组: [2], [2, 1], [3].
+注意:
+
+L, R  和 A[i] 都是整数，范围在 [0, 10^9]。
+数组 A 的长度范围在[1, 50000].
+
+### 解题思路
+
+DP问题，读题需要清晰，1.当在左侧时候，可以融入包含左边字母的序列，所以直接加dp，2.当在右边时候，序列需要中断，dp归零 3.当附和条件时候，包含这个数字的，到pre，也就是最后一个不符合的，是i-pre个。最后求和
+
+### tag
+
+DP
+
+```python
+class Solution(object):
+    def numSubarrayBoundedMax(self, A, L, R):
+        """
+        :type A: List[int]
+        :type L: int
+        :type R: int
+        :rtype: int
+        """
+        pre, dp = -1, 0
+        res = 0
+        for i in range(len(A)):
+            if A[i] < L:
+                res += dp
+            elif A[i] > R:
+                dp = 0
+                pre = i
+            else:
+                dp = i - pre
+                res += dp
+        return res
+
+```
+
