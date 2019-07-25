@@ -138,9 +138,31 @@ array([1, 0, 2])
 
 #### sns.barplot
 
-
-
 ```py
 sns.barplot(y=mark, x=x, orient='h')
-
 ```
+
+#### itertools.product 用法
+
+从小到大返回index
+
+~~~python
+lis = [[1,2,3],[3,6,7]]
+for temp in itertools.product(*lis):
+    print((temp))
+    
+```
+(1, 3)
+(1, 6)
+(1, 7)
+(2, 3)
+(2, 6)
+(2, 7)
+(3, 3)
+(3, 6)
+(3, 7)
+```
+返回排列组合tuple
+~~~
+
+#### 
