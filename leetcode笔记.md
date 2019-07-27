@@ -1488,3 +1488,116 @@ class Solution(object):
 
 ```
 
+## 767.重构字符串
+
+### 题目描述
+
+给定一个字符串S，检查是否能重新排布其中的字母，使得两相邻的字符不同。
+
+若可行，输出任意可行的结果。若不可行，返回空字符串。
+
+示例 1:
+
+输入: S = "aab"
+输出: "aba"
+示例 2:
+
+输入: S = "aaab"
+输出: ""
+
+### 解题思路
+
+根据最大堆的性质，每次弹出一种字母，随后将数字加一，与字母一同记录，随后下一轮如果还有的话，重新加回heap。保证每两个连续的不出自同一个字母
+
+### tag
+
+Greedy，heap
+
+```python
+from collections import Counter
+import heapq
+class Solution(object):
+    def reorganizeString(self, S):
+        """
+        :type S: str
+        :rtype: str
+        """
+        res = ""
+        pq = []
+        c = Counter(S)
+        for key,value in c.items():
+            heapq.heappush(pq,(-value,key))
+        p_a,p_b = 0,""
+        while(pq):
+            a,b = heapq.heappop(pq)
+            res += b
+            if p_a<0:
+                heapq.heappush(pq,(p_a,p_b))
+            a += 1
+            p_a,p_b = a,b
+        if len(res) == len(S):
+            return res
+        return ""
+```
+
+## 745.到达终点数字
+
+### 题目描述
+
+在一根无限长的数轴上，你站在0的位置。终点在target的位置。
+
+每次你可以选择向左或向右移动。第 n 次移动（从 1 开始），可以走 n 步。
+
+返回到达终点需要的最小移动次数。
+
+示例 1:
+
+输入: target = 3
+输出: 2
+解释:
+第一次移动，从 0 到 1 。
+第二次移动，从 1 到 3 。
+示例 2:
+
+输入: target = 2
+输出: 3
+解释:
+第一次移动，从 0 到 1 。
+第二次移动，从 1 到 -1 。
+第三次移动，从 -1 到 2 .
+
+### 解题思路
+
+https://www.cnblogs.com/grandyang/p/8456022.html
+
+### tag
+
+math
+
+```python
+from collections import deque
+class Solution(object):
+    def reachNumber(self, target):
+        """
+        :type target: int
+        :rtype: int
+        """
+        lis = deque([0])
+        # lis = [0]
+        if target == 0:
+            return 0
+        l = 1
+        step = 1
+        while (True):
+            for i in range(l):
+                temp = lis.popleft()
+                if temp + step == target or temp - step == target:
+                    return step
+                else:
+                    lis.append(temp + step)
+                    lis.append(temp - step)
+            l = len(lis)
+            step += 1
+
+```
+
