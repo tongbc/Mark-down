@@ -166,3 +166,23 @@ for temp in itertools.product(*lis):
 ~~~
 
 #### 
+
+#### contextmanager 用法
+
+计算函数的时间
+
+```python
+from contextlib import contextmanager
+import time
+@contextmanager
+def timer(title):
+    t0 = time.time()
+    yield
+    print("{} - done in {:.0f}s".format(title,time.time()-t0))
+   
+with timer("test"):
+    time.sleep(1)
+## test - done in 1s
+
+```
+
