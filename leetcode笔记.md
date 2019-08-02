@@ -1695,3 +1695,115 @@ class Solution(object):
         return df[len(s)]                
 ```
 
+## 781.森林中的兔子
+
+### 题目描述
+
+```
+森林中，每个兔子都有颜色。其中一些兔子（可能是全部）告诉你还有多少其他的兔子和自己有相同的颜色。我们将这些回答放在 answers 数组里。
+
+返回森林中兔子的最少数量。
+
+示例:
+输入: answers = [1, 1, 2]
+输出: 5
+解释:
+两只回答了 "1" 的兔子可能有相同的颜色，设为红色。
+之后回答了 "2" 的兔子不会是红色，否则他们的回答会相互矛盾。
+设回答了 "2" 的兔子为蓝色。
+此外，森林中还应有另外 2 只蓝色兔子的回答没有包含在数组中。
+因此森林中兔子的最少数量是 5: 3 只回答的和 2 只没有回答的。
+
+输入: answers = [10, 10, 10]
+输出: 11
+
+输入: answers = []
+输出: 0
+```
+
+### 解题思路
+
+逻辑
+
+### tag
+
+logical
+
+```python
+class Solution(object):
+    def numRabbits(self, answers):
+        """
+        :type answers: List[int]
+        :rtype: int
+        """
+        if not answers:
+            return 0
+        dic = {}
+        for num in answers:
+            if num not in dic:
+                dic[num]=1
+            else:
+                dic[num]+=1
+        sum = 0
+        for key,value in dic.items():
+            if key==0:
+                sum+=value
+            else:
+                if key<value:
+                    while(key<value):
+                        sum += (key+1)
+                        value = value-key-1
+                    if value!=0:
+                        sum+=(1+key)
+                else:
+                    sum +=(1+key)
+        return sum
+```
+
+## 763.划分字母区间
+
+### 题目描述
+
+字符串 S 由小写字母组成。我们要把这个字符串划分为尽可能多的片段，同一个字母只会出现在其中的一个片段。返回一个表示每个字符串片段的长度的列表。
+
+示例 1:
+
+输入: S = "ababcbacadefegdehijhklij"
+输出: [9,7,8]
+解释:
+划分结果为 "ababcbaca", "defegde", "hijhklij"。
+每个字母最多出现在一个片段中。
+像 "ababcbacadefegde", "hijhklij" 的划分是错误的，因为划分的片段数较少。
+
+### 解题思路
+
+贪心，从后往前先记录每个字母最后出现的位置，然后再从头到尾遍历，找到每个start，maxend，
+
+### tag
+
+greedy
+
+### 解法
+
+```python
+class Solution(object):
+    def partitionLabels(self, S):
+        """
+        :type S: str
+        :rtype: List[int]
+        """
+        dic = {}
+        for i in range(len(S),-1,-1):
+            if S[i] not in dic:
+                dic[S[i]] == i
+        start,end = 0,0
+        res = []
+        for index,s in enumerate(S):
+            if dic[S[index]]>end:
+                end = dic[S[index]]
+            if end==index:
+                res.append(end-start)
+                start,end = i+1,i+1
+        return res
+```
+
