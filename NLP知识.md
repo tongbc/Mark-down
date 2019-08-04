@@ -1,219 +1,30 @@
 # NLP知识
 
-- np.random.permutation
+### 自编码和自回归模型
 
-```python
-import numpy as np
-np.random.seed(5)
-a = np.arange(10)
-permusion = np.random.permutation(a)
-print(permusion)
-```
+![1564909673565](C:\Users\tbc\AppData\Roaming\Typora\typora-user-images\1564909673565.png)
 
-#### numpy数组添加
+如上所示分别为自回归模型与自编码模型，其中黄色块为输入字符，蓝色块为字符的位置。对于自回归语言模型，它希望通过已知的前半句预测后面的词或字。对于自编码语言模型，它希望通过一句话预测被 Mask 掉的字或词，如上所示第 2 个位置的词希望通过第 1、3、5 个词进行预测。
 
-```python
-import numpy as np
-embeds = np.asarray([[1,2],[2,3],[3,4]])
-temp = np.asarray([5,5])
-embeds += temp
-print(embeds)
-```
+以前，最常见的语言模型就是自回归式的了，它的计算效率比较高，且明确地建模了概率密度。但是自回归语言模型有一个缺陷，它只能编码单向语义，不论是从左到右还是从右到左都只是单向语义。这对于下游 NLP 任务来说是致命的，因此也就有了 BERT 那种自编码语言模型。
 
-#### Math.ceil
+BERT 通过预测被 Mask 掉的字或词，从而学习到双向语义信息。但这种任务又带来了新问题，它只是建模了近似的概率密度，因为 BERT 假设要预测的词之间是相互独立的，即 Mask 之间相互不影响。此外，自编码语言模型在预训练过程中会使用 MASK 符号，但在下游 NLP 任务中并不会使用，因此这也会造成一定的误差。
 
-```python
-import math
-print(math.ceil(12.4))
-##->13
-```
+从而将上面两类模型的优点结合起来。XLNet 采用了一种新型语言建模任务，它通过随机排列自然语言而预测某个位置可能出现的词。如下图所示为排列语言模型的预测方式：
 
-#### Pandas sample
+![](D:\md_images\xlnet2.jpg)
 
-```python
-data1 = un_data.loc[(data["CRASHSEV"] == 1)].sample(frac=1).iloc[:10000, :]
-##frac是要返回的比例，0.3的话就是返回百分之30的数据
-```
+这两件事是有冲突的，如果模型需要预测位置 2 的「喜欢」，那么肯定不能用该位置的内容向量。但与此同时，位置 2 的完整向量还需要参与位置 5 的预测，且同时不能使用位置 5 的内容向量。
 
-#### Pandas数据清洗之缺失数据
+这类似于条件句：如果模型预测当前词，则只能使用位置向量；如果模型预测后续的词，那么使用位置加内容向量。因此这就像我们既需要标准 Transformer 提供内容向量，又要另一个网络提供对应的位置向量。
 
-```python
-import numpy as np
-from numpy import nan
-import pandas as pd
-data=pd.DataFrame(np.arange(3,19,1).reshape(4,4),index=list('abcd'))
-print(data)
-data.iloc[0:2,0:3]=nan
-print(data)
-print(data.fillna(0))   ### 用0填充缺失数据
-###
-      0     1     2   3
-a   0.0   0.0   0.0   6
-b   0.0   0.0   0.0  10
-c  11.0  12.0  13.0  14
-d  15.0  16.0  17.0  18
-###
-```
+针对这种特性，研究者提出了 Two-Stream Self-Attention，它通过构建两条路径解决这个条件句。如下所示为 Two-Stream 的结构，其中左上角的 a 为 Content 流，左下角的 b 为 Query 流，右边的 c 为排列语言模型的整体建模过程。
 
-#### Pandas数据清洗之缺失数据
+![](D:\md_images\xlnet3.jpg)
 
-```python
-def one(a,*b):
-    """a是一个普通传入参数，*b是一个非关键字星号参数"""
-    print(b)
-one(1,2,3,4,5,6)
-#--------
-def two(a=1,**b):
-    """a是一个普通关键字参数，**b是一个关键字双星号参数"""
-    print(b)
-two(a=1,b=2,c=3,d=4,e=5,f=6)
-###
-第一个输出为：
-(2, 3, 4, 5, 6)
-第二个输出为：
-{'b': 2, 'c': 3, 'e': 5, 'f': 6, 'd': 4}
-###
-```
+在 Content 流中，它和标准的 Transformer 是一样的，第 1 个位置的隐藏向量 h_1 同时编码了内容与位置。在 Query 流中，第 1 个位置的隐向量 g_1 只编码了位置信息，但它同时还需要利用其它 Token 的内容隐向量 h_2、h_3 和 h_4，它们都通过 Content 流计算得出。因此，我们可以直观理解为，Query 流就是为了预测当前词，而 Content 流主要为 Query 流提供其它词的内容向量。
 
-#### embedding dict最牛逼形成方法
-
-```python
-EMBEDDING_FILE = '../input/embeddings/glove.840B.300d/glove.840B.300d.txt'
-    def get_coefs(word,*arr): return word, np.asarray(arr, dtype='float32')
-    embeddings_index = dict(get_coefs(*o.split(" ")) for o in open(EMBEDDING_FILE))
-```
-
-#### python format用法，
-
-```python
-age = "5"
-name = "bobby"
-print(f'{name} is {age} years old')
-
-f'''He said his name is {name.upper()}and he is {6 * seven} years old.'''
-##'He said his name is FRED and he is 42 years old.'
-
-```
-
-#### python string.punctuation用法，
-
-```python
-print(string.punctuation)
-#!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
-
-```
-
-#### numpy np.newaxis用法
-
-```python
-x1 = np.array([1, 2, 3, 4, 5]) 
-# the shape of x1 is (5,) 
-x1_new = x1[:, np.newaxis] 
-# now, the shape of x1_new is (5, 1) 
-# array([[1], 
-# [2], 
-# [3], 
-# [4], 
-# [5]]) 
-x1_new = x1[np.newaxis,:] 
-# now, the shape of x1_new is (1, 5) 
-# array([[1, 2, 3, 4, 5]])
-
-```
-
-#### multiprocessing.Pool() 用法
-
-```python
-def load_data(data):
-    return pd.read_csv(data)
-
-with multiprocessing.Pool() as pool:
-    train, test, sub = pool.map(load_data, ['../input/train.csv', '../input/test.csv', '../input/sample_submission.csv'])
-
-```
-
-#### collections.defaultdict(list) 用法
-
-```python
-targets = collections.defaultdict(list)
-
-```
-
-初始化字典value为list
-
-#### df.target.value_counts() 用法
-
-```python
-df = pd.DataFrame([["a1",5],["a2",6]],columns=["a","b"])
-df.b.value_counts()
-
-6    1
-5    1
-
-```
-
-#### np.argsort(lis) 用法
-
-从小到大返回index
-
-```python
-lis = [2,3,1]
-np.argsort(lis)[::-1]
-
-array([1, 0, 2])
-
-```
-
-#### sns.barplot
-
-```py
-sns.barplot(y=mark, x=x, orient='h')
-
-```
-
-#### itertools.product 用法
-
-从小到大返回index
-
-~~~python
-lis = [[1,2,3],[3,6,7]]
-for temp in itertools.product(*lis):
-    print((temp))
-    
-```
-(1, 3)
-(1, 6)
-(1, 7)
-(2, 3)
-(2, 6)
-(2, 7)
-(3, 3)
-(3, 6)
-(3, 7)
-```
-返回排列组合tuple
-
-~~~
-
-#### 
-
-#### contextmanager 用法
-
-计算函数的时间
-
-```python
-from contextlib import contextmanager
-import time
-@contextmanager
-def timer(title):
-    t0 = time.time()
-    yield
-    print("{} - done in {:.0f}s".format(title,time.time()-t0))
-   
-with timer("test"):
-    time.sleep(1)
-## test - done in 1s
+上图 c 展示了 XLNet 的完整计算过程，e 和 w 分别是初始化的词向量的 Query 向量。注意排列语言模型的分解顺序是 3、2、4、1，因此 Content 流的 Mask 第一行全都是红色、第二行中间两个是红色，这表明 h_1 需要用所有词信息、h_2 需要用第 2 和 3 个词的信息。此外，Query 流的对角线都是空的，表示它们不能使用自己的内容向量 h。
 
 
-```
 
