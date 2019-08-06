@@ -1807,3 +1807,168 @@ class Solution(object):
         return res
 ```
 
+## 775.全局倒置和局部倒置
+
+### 题目描述
+
+数组 A 是 [0, 1, ..., N - 1] 的一种排列，N 是数组 A 的长度。全局倒置指的是 i,j 满足 0 <= i < j < N 并且 A[i] > A[j] ，局部倒置指的是 i 满足 0 <= i < N 并且 A[i] > A[i+1] 。
+
+当数组 A 中全局倒置的数量等于局部倒置的数量时，返回 true 。
+
+ 
+
+示例 1:
+
+输入: A = [1,0,2]
+输出: true
+解释: 有 1 个全局倒置，和 1 个局部倒置。
+示例 2:
+
+输入: A = [1,2,0]
+输出: false
+解释: 有 2 个全局倒置，和 1 个局部倒置。
+
+### 解题思路
+
+隔一个或几个以外的前大于后则Flase
+
+### tag
+
+### tag
+
+logical
+
+### 解法
+
+```python
+class Solution(object):
+    def isIdealPermutation(self, A):
+        """
+        :type A: List[int]
+        :rtype: bool
+        """
+        if len(A)==1 or len(A)==2:
+            return True
+        m = A[0]
+        for i in range(2,len(A)):
+            if A[i]<m:
+                return False
+            else:
+                m = min(m,A[i-1])
+        return True
+```
+
+## 779. 第K个语法符号
+
+在第一行我们写上一个 0。接下来的每一行，将前一行中的0替换为01，1替换为10。
+
+给定行数 N 和序数 K，返回第 N 行中第 K个字符。（K从1开始）
+
+
+例子:
+
+输入: N = 1, K = 1
+输出: 0
+
+输入: N = 2, K = 1
+输出: 0
+
+输入: N = 2, K = 2
+输出: 1
+
+输入: N = 4, K = 5
+输出: 1
+
+解释:
+第一行: 0
+第二行: 01
+第三行: 0110
+第四行: 01101001
+
+### 解题思路
+
+找规律，直接递归（注意python3和python2的区别， 在2中：1/2 = 0 ,3中， 1/2 = 0.5）
+
+### tag
+
+递归
+
+### 解法
+
+```python
+import math
+class Solution(object):
+    def kthGrammar(self, N, K):
+        """
+        :type N: int
+        :type K: int
+        :rtype: int
+        """
+        if N == 1:
+            return 0
+        else:
+            order = math.ceil(K / 2.0)
+            num = self.kthGrammar(N - 1, math.ceil(K / 2.0))
+            if num == 0:
+                if K % 2 != 0:
+                    return 0
+                else:
+                    return 1
+            else:
+                if K % 2 != 0:
+                    return 1
+                else:
+                    return 0
+
+```
+
+## 740.删除和获得点数
+
+给定一个整数数组 nums ，你可以对它进行一些操作。
+
+每次操作中，选择任意一个 nums[i] ，删除它并获得 nums[i] 的点数。之后，你必须删除每个等于 nums[i] - 1 或 nums[i] + 1 的元素。
+
+开始你拥有 0 个点数。返回你能通过这些操作获得的最大点数。
+
+示例 1:
+
+输入: nums = [3, 4, 2]
+输出: 6
+解释: 
+删除 4 来获得 4 个点数，因此 3 也被删除。
+之后，删除 2 来获得 2 个点数。总共获得 6 个点数
+
+### 解题思路
+
+注意读题！！！每次操作=删了一个，获得这个的点数，删除所有与之临近值的元素，随后继续，排序后like house rober，简单的dp，dp[i] = max(dp[i-1],dp[i-2]+v)， key：要知道，dp[i-1]>=dp[i-2]，所以当隔一个时候，直接dp[i-2]+v.
+
+### tag
+
+### tag
+
+dp
+
+### 解法
+
+```python
+class Solution(object):
+    def deleteAndEarn(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        dic = {}
+        for num in nums:
+            dic[num] = dic.get(num,0)+num
+        res = [0]
+        key_set = set()
+        for k,v in sorted(dic.items()):
+            if k-1 not in key_set:
+                key_set.add(k)
+                res.append(res[-1]+v)
+            else:
+                key_set.add(k)
+                res.append(max(res[-2]+v,res[-1]))
+        return res[-1]
+```
+
