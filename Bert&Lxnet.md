@@ -101,6 +101,41 @@ my dog is hairy → my dog is hairy
 
 这样存在另一个问题在于在训练过程中只有15%的token被预测，正常的语言模型实际上是预测每个token的，因此Masked LM相比正常LM会收敛地慢一些，后面的实验也的确证实了这一点。
 
+**pytorch版代码如下**
+
+```python
+    def random_word(self, sentence):
+        tokens = sentence.split()
+        output_label = []
+
+        for i, token in enumerate(tokens):
+            prob = random.random()
+            if prob < 0.15:
+                prob /= 0.15
+
+                # 80% randomly change token to mask token
+                if prob < 0.8:
+                    tokens[i] = self.vocab.mask_index
+
+                # 10% randomly change token to random token
+                elif prob < 0.9:
+                    tokens[i] = random.randrange(len(self.vocab))
+
+                # 10% randomly change token to current token
+                else:
+                    tokens[i] = self.vocab.stoi.get(token, self.vocab.unk_index)
+
+                output_label.append(self.vocab.stoi.get(token, self.vocab.unk_index))
+
+            else:
+                tokens[i] = self.vocab.stoi.get(token, self.vocab.unk_index)
+                output_label.append(0)
+
+        return tokens, output_label
+```
+
+
+
 ### Next Sentence Prediction
 
 很多需要解决的NLP tasks依赖于句子间的关系，例如问答任务等，这个关系语言模型是获取不到的，因此将下一句话预测作为了第二个预训练任务。该任务的训练语料是两句话，来预测第二句话是否是第一句话的下一句话，如下所示
@@ -128,6 +163,14 @@ my dog is hairy → my dog is hairy
 对比ELMo，虽然都是“双向”，但目标函数其实是不同的。ELMo是分别以![[公式]](https://www.zhihu.com/equation?tex=P%28w_i%7C+w_1%2C+...w_%7Bi-1%7D%29) 和 ![[公式]](https://www.zhihu.com/equation?tex=P%28w_i%7Cw_%7Bi%2B1%7D%2C+...w_n%29) 作为目标函数，独立训练处两个representation然后拼接，而BERT则是以 ![[公式]](https://www.zhihu.com/equation?tex=P%28w_i%7Cw_1%2C++...%2Cw_%7Bi-1%7D%2C+w_%7Bi%2B1%7D%2C...%2Cw_n%29) 作为目标函数训练LM。
 
 ### Embedding
+
+[***三种embedding详解***](https://cloud.tencent.com/developer/article/1460597)
+
+#### position embedding
+
+![](D:\md_images\position embedding.jpg)
+
+
 
 这里的Embedding由三种Embedding求和而成：![img](https://pic2.zhimg.com/80/v2-11505b394299037e999d12997e9d1789_hd.jpg)
 

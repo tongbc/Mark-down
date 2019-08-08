@@ -1834,8 +1834,6 @@ class Solution(object):
 
 ### tag
 
-### tag
-
 logical
 
 ### 解法
@@ -1944,8 +1942,6 @@ class Solution(object):
 
 ### tag
 
-### tag
-
 dp
 
 ### 解法
@@ -1970,5 +1966,131 @@ class Solution(object):
                 key_set.add(k)
                 res.append(max(res[-2]+v,res[-1]))
         return res[-1]
+```
+
+## 783.二叉搜索树结点最小距离
+
+给定一个二叉搜索树的根结点 root, 返回树中任意两节点的差的最小值。
+
+示例：
+
+输入: root = [4,2,6,1,3,null,null]
+输出: 1
+解释:
+注意，root是树结点对象(TreeNode object)，而不是数组。
+
+给定的树 [4,2,6,1,3,null,null] 可表示为下图:
+
+          4
+        /   \
+      2      6
+     / \    
+    1   3  
+
+最小的差值是 1, 它是节点1和节点2的差值, 也是节点3和节点2的差值。
+
+### 解题思路
+
+二叉搜索树，中序遍历.
+
+### tag
+
+BST
+
+### 解法1 
+
+```python
+    pre = -float('inf')
+    res = float('inf')
+
+    def minDiffInBST(self, root):
+        if root is None:
+            return
+        
+        self.minDiffInBST(root.left)
+		# evaluate and set the current node as the node previously evaluated
+        self.res = min(self.res, root.val - self.pre)
+        self.pre = root.val
+		
+        self.minDiffInBST(root.right)
+        return self.res
+```
+
+### 解法2
+
+```python
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution:
+    def minDiffInBST(self, root: TreeNode) -> int:
+        res = []
+        self.part(root.left,res)
+        res.append(root.val)
+        self.part(root.right,res)
+        m = 0xfffffff
+        for i in range(len(res)-1):
+            m= min(m,res[i+1]-res[i])
+        return m
+    def part(self,root,res):
+        if not root:
+            return
+        self.part(root.left,res)
+        res.append(root.val)
+        self.part(root.right,res)
+```
+
+## 788.旋转数字
+
+### 题目描述
+
+我们称一个数 X 为好数, 如果它的每位数字逐个地被旋转 180 度后，我们仍可以得到一个有效的，且和 X 不同的数。要求每位数字都要被旋转。
+
+如果一个数的每位数字被旋转以后仍然还是一个数字， 则这个数是有效的。0, 1, 和 8 被旋转后仍然是它们自己；2 和 5 可以互相旋转成对方；6 和 9 同理，除了这些以外其他的数字旋转以后都不再是有效的数字。
+
+现在我们有一个正整数 N, 计算从 1 到 N 中有多少个数 X 是好数？
+
+示例:
+输入: 10
+输出: 4
+解释: 
+在[1, 10]中有四个好数： 2, 5, 6, 9。
+注意 1 和 10 不是好数, 因为他们在旋转之后不变。
+
+### 解题思路
+
+dp，记录住之前的部分，1代表可以用，但是不存在旋转变换，2代表存在旋转的
+
+### tag
+
+dp
+
+### 解法
+
+```python
+class Solution:
+    def rotatedDigits(self, N: int) -> int:
+        dp = [0]*(N+1)
+        count = 0
+        for i in range(N+1):
+            if i<10:
+                if i==0 or i==1 or i==8:
+                    dp[i]=1
+                elif i==2 or i==5 or i==6 or i==9:
+                    dp[i]=2
+                    count+=1
+            else:
+                a,b = dp[i//10],dp[i%10]
+                if a==1 and b==1 :
+                    dp[i]=1
+                elif a>=1 and b>=1:
+                    dp[i] =2 
+                    count+=1
+        return count
+        
 ```
 

@@ -186,3 +186,45 @@ with timer("test"):
 
 ```
 
+### lambda
+
+根据dic的key  or value排序
+
+```python
+dic = {"abc":2,"cba":1}
+new_dic = sorted(dic.items(),key=lambda tp:tp[1])
+```
+
+### df["target"].value_counts()
+
+根据字段计数
+
+```python
+train["target"].value_counts()
+''' 
+0    1225312
+1      80810
+Name: target, dtype: int64
+'''
+```
+
+### re  正则
+
+根据字段计数
+
+```python
+import re
+def clean_text(x):
+    x = str(x)
+    for punct in puncts:
+        x = x.replace(punct, f' {punct} ')
+    return x
+def clean_numbers(x):
+    x = re.sub('[0-9]{5,}', '#####', x)
+    x = re.sub('[0-9]{4}', '####', x)
+    x = re.sub('[0-9]{3}', '###', x)
+    x = re.sub('[0-9]{2}', '##', x)
+    return x
+
+```
+
