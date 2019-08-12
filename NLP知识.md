@@ -107,3 +107,16 @@ TP为1400：有1400条鲤鱼被预测出来；FP为600：有600个生物不是�
 
 Precision=TP/(TP+FP)=1400/(1400+600)=70%
 Recall=TP/(TP+FN)=1400/(1400)=100%
+
+### Attention
+
+[苏建林老师 Attention解读](https://kexue.fm/archives/4765)
+
+O_seq = Attention(8,16)([embeddings,embeddings,embeddings]) 这行代码里的8和16表达什么意思
+
+Multi-Head Attention中的h和d~v（请通读本文并对照源码）
+
+[muti-haed Attention苏神代码详解](https://zhuanlan.zhihu.com/p/67836133)
+
+[遍地开花Attention](https://mp.weixin.qq.com/s/MzHmvbwxFCaFjmMkjfjeSg)
+
