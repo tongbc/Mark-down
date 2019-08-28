@@ -2213,8 +2213,6 @@ class Solution(object):
 
 ## 856. 括号的分数
 
-## 题目描述
-
 ### 题目描述
 
 给定一个平衡括号字符串 S，按下述规则计算该字符串的分数：
@@ -2275,5 +2273,125 @@ class Solution(object):
      def maxIncreaseKeepingSkyline(self, grid):
         row, col = map(max, grid), map(max, zip(*grid))
         return sum(min(i, j) for i in row for j in col) - sum(map(sum, grid))           
+```
+
+## 861. 翻转矩阵后的得分
+
+### 题目描述
+
+有一个二维矩阵 A 其中每个元素的值为 0 或 1 。
+
+移动是指选择任一行或列，并转换该行或列中的每一个值：将所有 0 都更改为 1，将所有 1 都更改为 0。
+
+在做出任意次数的移动后，将该矩阵的每一行都按照二进制数来解释，矩阵的得分就是这些数字的总和。
+
+返回尽可能高的分数。
+
+ 
+
+示例：
+
+输入：[[0,0,1,1],[1,0,1,0],[1,1,0,0]]
+输出：39
+解释：
+转换为 [[1,1,1,1],[1,0,0,1],[1,1,1,1]]
+0b1111 + 0b1001 + 0b1111 = 15 + 9 + 15 = 39
+
+### 解题思路
+
+贪婪算法，第一个必须得等于2，后面的话就只能列变换
+
+逻辑
+
+### tag
+
+greedy
+
+### 解法
+
+```python
+class Solution:
+    def matrixScore(self, A: List[List[int]]) -> int:
+        a,b = len(A),len(A[0])
+        res = 0
+        lis = [0]*b
+        for i in range(a):
+            if A[i][0]==0:
+                for j in range(1,b):
+                    if A[i][j]==0:
+                        lis[j]+=1
+            else:
+                for j in range(1,b):
+                    if A[i][j]==1:
+                        lis[j]+=1                
+        res+=a*(2**(b-1))
+        for i in range(1,len(lis)):
+            res+=max(lis[i],a-lis[i])*(2**(b-1-i))
+        return res
+        def matrixScore(self, A):
+            M, N = len(A), len(A[0])
+            res = (1 << N - 1) * M
+            for j in range(1, N):
+                cur = sum(A[i][j] == A[i][0] for i in range(M))
+                res += max(cur, M - cur) * (1 << N - 1 - j)
+            return res
+```
+
+## 863. 二叉树中所有距离为 K 的结点
+
+### 题目描述
+
+给定一个二叉树（具有根结点 root）， 一个目标结点 target ，和一个整数值 K 。
+
+返回到目标结点 target 距离为 K 的所有结点的值的列表。 答案可以以任何顺序返回。
+
+输入：root = [3,5,1,6,2,0,8,null,null,7,4], target = 5, K = 2
+
+输出：[7,4,1]
+
+解释：
+所求结点为与目标结点（值为 5）距离为 2 的结点，
+值分别为 7，4，以及 1
+
+### 解题思路
+
+先dfs，把节点相邻的集合放入map中，随后bfs，层次遍历
+
+### tag
+
+bfs,dfs
+
+### 解法
+
+```python
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+import collections
+class Solution:
+    def distanceK(self, root, target, K):
+        """
+        :type root: TreeNode
+        :type target: TreeNode
+        :type K: int
+        :rtype: List[int]
+        """
+        conn = collections.defaultdict(list)
+        def connect(par,child):
+            if  par and  child:
+                conn[par.val].append(child.val)
+                conn[child.val].append(par.val)
+            if child.left:connect(child,child.left)
+            if child.right:connect(child,child.right)
+        connect(None,root)
+        bfs = [target.val]
+        seen = set(bfs)
+        for i in range(K):
+            bfs = [y for x in bfs for y in conn[x] if y not in seen]
+            seen |= set(bfs)
+        return bfs
 ```
 
