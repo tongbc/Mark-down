@@ -2437,3 +2437,84 @@ class Solution:
         return deep(root)[1]
 ```
 
+## 868. 二进制间距
+
+### 题目描述
+
+给定一个正整数 `N`，找到并返回 `N` 的二进制表示中两个连续的 1 之间的最长距离。 
+
+如果没有两个连续的 1，返回 `0` 。
+
+### 解题思路
+
+用bin()
+
+如果l[0]>r[0]，则说明在左边，反之在右边
+
+### tag
+
+easy
+
+### 解法
+
+```python
+class Solution:
+    def binaryGap(self, N: int) -> int:
+        pre,dis = 0,0
+        for i,num in enumerate(bin(N)[2:]):
+            if num == "1":
+                dis = max(dis,i-pre)
+                pre = i
+        return dis
+```
+
+## 869. 重新排序得到 2 的幂
+
+### 题目描述
+
+给定正整数 N ，我们按任何顺序（包括原始顺序）将数字重新排序，注意其前导数字不能为零。
+
+如果我们可以通过上述方式得到 2 的幂，返回 true；否则，返回 false。
+
+示例 1：
+
+输入：1
+输出：true
+示例 2：
+
+输入：10
+输出：false
+
+### 解题思路
+
+Counter,遍历
+
+### tag
+
+Counter
+
+### 解法
+
+```python
+from collections import Counter
+class Solution:
+    def reorderedPowerOf2(self, N: int) -> bool:
+        b = Counter(str(N))
+        lb = len(str(N))
+        power = 1
+        while(True):
+            la = len(str(power))
+            if la<lb:
+                power = power*2
+                continue
+            elif la>lb:
+                break
+            else:
+                if Counter(str(power)) == b:
+                    return True
+                else:
+                    power = power*2
+                    continue
+        return False
+```
+
