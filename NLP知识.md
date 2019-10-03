@@ -81,6 +81,8 @@ FinalData(10*1) = DataAdjust(10*2矩阵) x 特征向量(-0.677873399, -0.7351786
 
 ###  F1,precision,recall
 
+[全部的]https://zhuanlan.zhihu.com/p/34079183
+
 
 某池塘有1400条鲤鱼，300只虾，300只鳖。现在以捕鲤鱼为目的。撒一大网，逮着了700条鲤鱼，200只虾，100只鳖。那么，这些指标分别如下：
 
@@ -120,3 +122,190 @@ Multi-Head Attention中的h和d~v（请通读本文并对照源码）
 
 [遍地开花Attention](https://mp.weixin.qq.com/s/MzHmvbwxFCaFjmMkjfjeSg)
 
+### 样本不均衡问题
+
+1. 上采样/下采样
+
+   下采样，对于一个不均衡的数据，让目标值(如0和1分类)中的样本数据量相同，且以数据量少的一方的样本数量为准。上采样就是以数据量多的一方的样本数量为标准，把样本数量较少的类的样本数量生成和样本数量多的一方相同，称为上采样。
+
+   下采样
+
+   获取数据时一般是从分类样本多的数据从随机抽取等数量的样本
+
+2. 分类损失函数
+
+   通常二分类使用交叉熵损失函数，但是在样本不均衡下，训练时损失函数会偏向样本多的一方，造成训练时损失函数很小，但是对样本较小的类别识别精度不高。
+
+   解决办法之一就是给较少的类别加权，形成加权交叉熵(Weighted cross entropy loss)。今天看到两个方法将权值作为类别样本数量的函数，其中有一个很有意思就录在这里。
+
+   ![1568552629287](C:\Users\tbc\AppData\Roaming\Typora\typora-user-images\1568552629287.png)
+
+   上边说明的时，正负样本的权值和他们的对方数量成比例，举个例子，比如正样本有30，负样本有70，那么正样本的权w+=70/(30+70)=0.7，负样本的权就是w-=30/(30+70)=0.3，
+
+   这样算下来的权值是归一的。这种方法比较直观，普通，应该是线性的。
+
+   ![1568552662253](C:\Users\tbc\AppData\Roaming\Typora\typora-user-images\1568552662253.png)
+
+   这个的权值直接就是该类别样本数的反比例函数，是非线性的，相比于上边的很有意思，提供了另一种思路。为了统一期间还是使用w+,w-表示这里的beta P和beta N，
+
+   举个例子，比如正样本有30，负样本有70，那么正样本的权w+=(30+70)/30=3.33，负样本的权就是w-=(30+70)/70=1.42。
+
+3. focal loss
+
+   https://blog.csdn.net/c9Yv2cf9I06K2A9E/article/details/78920998
+
+### CRF
+
+LTSM and CRF
+
+https://www.zhihu.com/question/35866596/answer/139485548
+
+作者：Scofield
+
+
+
+
+
+既然LSTM都OK了，为啥researchers搞一个LSTM+CRF的hybrid model? 
+
+哈哈，因为a single LSTM预测出来的标注有问题啊！举个segmentation例子(BES; char level)，plain LSTM 会搞出这样的结果：
+
+> **input**: "学习出一个模型，然后再预测出一条指定"
+> **expected output**: 学/B 习/E 出/S 一/B 个/E 模/B 型/E ，/S 然/B 后/E 再/E 预/B 测/E ……
+> **real output**: 学/B 习/E 出/S 一/B 个/B 模/B 型/E ，/S 然/B 后/B 再/E 预/B 测/E ……
+
+看到不，用LSTM，整体的预测accuracy是不错indeed, 但是会出现上述的错误：在B之后再来一个B。这个错误在CRF中是不存在的，因为CRF的特征函数的存在就是为了对given序列观察学习各种特征（n-gram，窗口），这些特征就是在限定窗口size下的各种词之间的关系。然后一般都会学到这样的一条规律（特征）：B后面接E，不会出现E。这个限定特征会使得CRF的预测结果不出现上述例子的错误。当然了，CRF还能学到更多的限定特征，那越多越好啊！
+
+https://zhuanlan.zhihu.com/p/44042528
+
+LOSS_FUNCTION = P_real_path/(P_all)
+
+![1569574124604](C:\Users\tbc\AppData\Roaming\Typora\typora-user-images\1569574124604.png)
+
+### 朴素贝叶斯为何朴素
+
+https://zhuanlan.zhihu.com/p/26262151
+
+**p(不帅、性格不好、身高矮、不上进|嫁) = p(不帅|嫁)\*p(性格不好|嫁)\*p(身高矮|嫁)\*p(不上进|嫁)**
+
+等等，为什么这个成立呢？学过概率论的同学可能有感觉了，这个等式成立的条件需要特征之间相互独立吧！
+
+**对的！这也就是为什么朴素贝叶斯分类有朴素一词的来源，朴素贝叶斯算法是假设各个特征之间相互独立，那么这个等式就成立了！**
+
+**为什么需要假设特征之间相互独立呢？**
+
+1、我们这么想，假如没有这个假设，那么我们对右边这些概率的估计其实是不可做的，这么说，我们这个例子有4个特征，其中帅包括{帅，不帅}，性格包括{不好，好，爆好}，身高包括{高，矮，中}，上进包括{不上进，上进}，**那么四个特征的联合概率分布总共是4维空间，总个数为2\*3\*3\*2=36个。**
+
+**24个，计算机扫描统计还可以，但是现实生活中，往往有非常多的特征，每一个特征的取值也是非常之多，那么通过统计来估计后面概率的值，变得几乎不可做，这也是为什么需要假设特征之间独立的原因。**
+
+2、假如我们没有假设特征之间相互独立，那么我们统计的时候，就需要在整个特征空间中去找，比如统计p(不帅、性格不好、身高矮、不上进|嫁),
+
+**我们就需要在嫁的条件下，去找四种特征全满足分别是不帅，性格不好，身高矮，不上进的人的个数，这样的话，由于数据的稀疏性，很容易统计到0的情况。 这样是不合适的。**
+
+根据上面俩个原因，朴素贝叶斯法对条件概率分布做了条件独立性的假设，由于这是一个较强的假设，朴素贝叶斯也由此得名！这一假设使得朴素贝叶斯法变得简单，但有时会牺牲一定的分类准确率。
+
+### NLLLoss  CrossEntropyLoss
+
+https://blog.csdn.net/qq_22210253/article/details/85229988
+
+NLLLoss需要先softmax，再log，再送入
+
+而CrossEntropyLoss
+
+### torch
+
+1.torch实现正则化
+
+torch.optim
+
+optimizer = optim.Adam(model.parameters(),lr=learning_rate,weight_decay=0.01)
+
+只是L2正则化
+
+就整体而言，对比加入正则化和未加入正则化的模型，训练输出的loss和Accuracy信息，我们可以发现，加入正则化后，loss下降的速度会变慢，准确率Accuracy的上升速度会变慢，并且未加入正则化模型的loss和Accuracy的浮动比较大（或者方差比较大），而加入正则化的模型训练loss和Accuracy，表现的比较平滑。并且随着正则化的权重lambda越大，表现的更加平滑。这其实就是正则化的对模型的惩罚作用，通过正则化可以使得模型表现的更加平滑，即通过正则化可以有效解决模型过拟合的问题。
+
+### 优化器
+
+[momentum 动量法]https://blog.csdn.net/tsyccnh/article/details/76270707
+
+[优化器各参数]https://blog.csdn.net/qq_34690929/article/details/79932416
+
+### batch normalization
+
+https://www.cnblogs.com/guoyaohua/p/8724433.html
+
+本质思想：BN的基本思想其实相当直观：因为深层神经网络在做非线性变换前的**激活输入值**（就是那个x=WU+B，U是输入）**随着网络深度加深或者在训练过程中，其分布逐渐发生偏移或者变动，之所以训练收敛慢，一般是整体分布逐渐往非线性函数的取值区间的上下限两端靠近**（对于Sigmoid函数来说，意味着激活输入值WU+B是大的负值或正值），所以这**导致反向传播时低层神经网络的梯度消失**，这是训练深层神经网络收敛越来越慢的**本质原因**，**而BN就是通过一定的规范化手段，把每层神经网络任意神经元这个输入值的分布强行拉回到均值为0方差为1的标准正态分布**，其实就是把越来越偏的分布强制拉回比较标准的分布，这样使得激活输入值落在非线性函数对输入比较敏感的区域，这样输入的小变化就会导致损失函数较大的变化，意思是**这样让梯度变大，避免梯度消失问题产生，而且梯度变大意味着学习收敛速度快，能大大加快训练速度。**
+
+　　THAT’S IT。其实一句话就是：**对于每个隐层神经元，把逐渐向非线性函数映射后向取值区间极限饱和区靠拢的输入分布强制拉回到均值为0方差为1的比较标准的正态分布，使得非线性变换函数的输入值落入对输入比较敏感的区域，以此避免梯度消失问题。**因为梯度一直都能保持比较大的状态，所以很明显对神经网络的参数调整效率比较高，就是变动大，就是说向损失函数最优值迈动的步子大，也就是说收敛地快。BN说到底就是这么个机制，方法很简单，道理很深刻。
+
+### 反向面试
+
+https://github.com/yifeikong/reverse-interview-zh
+
+### 损失函数
+
+1. MSE mean square error 
+
+   二次函数仅具有全局最小值。由于没有局部最小值，所以我们永远不会陷入它。因此，可以保证梯度下降将收敛到全局最小值(如果它完全收敛)。
+
+   MSE损失函数通过平方误差来惩罚模型犯的大错误。把一个比较大的数平方会使它变得更大。但有一点需要注意，这个属性使MSE成本函数对异常值的健壮性降低。**因此，如果我们的数据容易出现许多的异常值，则不应使用这个它。**
+
+2. 绝对误差损失
+
+   L1Loss，**与MSE相比，MAE成本对异常值更加健壮**。
+
+3. Huber损失
+
+   对于较小的误差，它是二次的，否则是线性的(对于其梯度也是如此)。Huber损失对于异常值比MSE更强
+
+4. 交叉熵，熵，KL散度
+
+   https://blog.csdn.net/Dby_freedom/article/details/83374650
+
+   https://www.jianshu.com/p/ae3932eda8f2
+
+5. BCEWithLogitsLoss
+
+   二分交叉熵，省略了sigmoid这一步
+
+
+
+### 处理缺失值
+
+https://www.kaggle.com/rtatman/data-cleaning-challenge-handling-missing-values
+
+### NLP校招
+
+https://zhuanlan.zhihu.com/p/62902811
+
+[古老。。汇总！！！非常重要]https://zhuanlan.zhihu.com/p/41975491
+
+[非常重要的transformer]https://zhuanlan.zhihu.com/p/48508221
+
+[面试问题]https://zhuanlan.zhihu.com/p/55643274
+
+[word2vec]https://www.zhihu.com/question/44832436/answer/266068967
+
+[transformer源码]https://blog.csdn.net/stupid_3/article/details/83184691
+
+[deep learning 调参]https://www.zhihu.com/question/41631631/answer/776852832
+
+[SVM面试会问的]https://zhuanlan.zhihu.com/p/76946313
+
+[京东问题]https://zhuanlan.zhihu.com/p/40870443
+
+[LSTM]https://zhuanlan.zhihu.com/p/79064602    https://zhuanlan.zhihu.com/p/39191116
+
+[torch的坑]https://www.zhihu.com/question/67209417/answer/835804637
+
+[**非常关键的机器学习面试点！！！**]https://zhuanlan.zhihu.com/p/77587367
+
+[归一化和标准化]https://www.jianshu.com/p/95a8f035c86c   https://blog.csdn.net/u010947534/article/details/86632819     https://www.cnblogs.com/chaosimple/p/4153167.html
+
+举一个简单的例子，在KNN中，我们需要计算待分类点与所有实例点的距离。假设每个实例点（instance）由n个features构成。如果我们选用的距离度量为欧式距离，如果数据预先没有经过归一化，那么那些绝对值大的features在欧式距离计算的时候起了决定性作用。
+
+从经验上说，归一化是让不同维度之间的特征在数值上有一定比较性，可以大大提高分类器的准确性。
+
+**平方损失函数的东西，具体形式可以写成 ![[公式]](https://www.zhihu.com/equation?tex=%5Cfrac%7B1%7D%7B2%7D%5Csum_%7B0%7D%5E%7Bn%7D%7B%7D%28y_%7Bi%7D-F%28x_%7Bi%7D%29%29%5E%7B2%7D) ，熟悉其他算法的原理应该知道，这个损失函数主要针对回归类型的问题，分类则是用熵值类的损失函数。**
+
+[GBDT]https://zhuanlan.zhihu.com/p/29765582
