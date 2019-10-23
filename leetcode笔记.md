@@ -1,7 +1,7 @@
 # LeetCode笔记
 
-
 ## 204. 计数质数
+
 ### 题目描述
 
 统计所有小于非负整数 n 的质数的数量。
@@ -2516,5 +2516,858 @@ class Solution:
                     power = power*2
                     continue
         return False
+```
+
+## 2. 两数字相加
+
+### 题目描述
+
+给出两个 非空 的链表用来表示两个非负的整数。其中，它们各自的位数是按照 逆序 的方式存储的，并且它们的每个节点只能存储 一位 数字。
+
+如果，我们将这两个数相加起来，则会返回一个新的链表来表示它们的和。
+
+您可以假设除了数字 0 之外，这两个数都不会以 0 开头。
+
+示例：
+
+输入：(2 -> 4 -> 3) + (5 -> 6 -> 4)
+输出：7 -> 0 -> 8
+原因：342 + 465 = 807
+
+### 解题思路
+
+
+
+### tag
+
+
+
+### 解法
+
+```python
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+class Solution:
+    def addTwoNumbers(self, l1: ListNode, l2: ListNode) -> ListNode:
+        carry = 0
+        root = n = ListNode(0)
+        while l1 or l2 or carry:
+            v1,v2 = 0,0
+            if l1:
+                v1 = l1.val
+                l1 = l1.next
+            if l2:
+                v2 = l2.val
+                l2 = l2.next
+            carry,v = divmod(v1+v2+carry,10)
+            node = ListNode(v)
+            n.next = node
+            n = n.next
+        return root.next
+```
+
+## 11. 盛水最多的容器
+
+### 题目描述
+
+给定 n 个非负整数 a1，a2，...，an，每个数代表坐标中的一个点 (i, ai) 。在坐标内画 n 条垂直线，垂直线 i 的两个端点分别为 (i, ai) 和 (i, 0)。找出其中的两条线，使得它们与 x 轴共同构成的容器可以容纳最多的水。
+
+说明：你不能倾斜容器，且 n 的值至少为 2。
+
+### 解题思路
+
+看最小的那边，如果向里收缩比他还小，就继续收缩，出现一个大一些的值，比较
+
+### tag
+
+
+
+### 解法
+
+```python
+class Solution:
+    def maxArea(self, height: List[int]) -> int:
+        l,r = 0,len(height)-1
+        m = -1
+        while(l<r):
+            a,b = height[l],height[r]
+            if a<b:
+                area = a*(r-l)
+                while(height[l]<=a):
+                    l+=1
+            else:
+                area = b*(r-l)
+                while(height[r]<=b) and r:
+                    r-=1
+            m = max(m,area)
+        return m
+```
+
+## 15. three sum
+
+### 题目描述
+
+给定一个包含 n 个整数的数组 nums，判断 nums 中是否存在三个元素 a，b，c ，使得 a + b + c = 0 ？找出所有满足条件且不重复的三元组。
+
+注意：答案中不可以包含重复的三元组。
+
+例如, 给定数组 nums = [-1, 0, 1, 2, -1, -4]，
+
+满足要求的三元组集合为：
+[
+  [-1, 0, 1],
+  [-1, -1, 2]
+]
+
+### 解题思路
+
+从头到l-2开始遍历，右边双指针，移动
+
+### tag
+
+
+
+### 解法
+
+```python
+class Solution:
+    def threeSum(self, nums: List[int]) -> List[List[int]]:
+        nums.sort()
+        res = []
+        for i in range(len(nums)-2):
+            if i > 0 and nums[i] == nums[i - 1]:
+                continue
+            a,b = i+1,len(nums)-1
+            temp = -nums[i]
+            while(b>a):
+                if temp==(nums[b]+nums[a]):
+                    # t_res = [nums[i],nums[a],nums[b]]
+                    # if t_res not in res:
+                    #     res.append(t_res)
+                    # a+=1
+                    while a < len(nums) - 1 and nums[a] == nums[a + 1]:
+                        a += 1
+                    while b > 0 and nums[b] == nums[b - 1]:
+                        b -= 1
+                    res.append([nums[i], nums[a], nums[b]])
+                    a += 1
+                elif temp>(nums[b]+nums[a]):
+                    a+=1
+                else:
+                    b-=1
+        return res
+```
+
+## 55555.  拓扑排序 
+
+### 题目描述
+
+拓扑排序
+
+A mapping of digit to letters (just like on the telephone buttons) is given below. Note that 1 does not map to any letters.
+
+**Example:**
+
+```
+Input: G = {
+    'a':'bf',
+    'b':'cdf',
+    'c':'d',
+    'd':'ef',
+    'e':'f',
+    'f':''
+}
+Output: ['a', 'b', 'c', 'd', 'e', 'f']
+```
+
+### 解题思路
+
+统计每个节点的入度，入度为0的形成一个栈，每次出一个入度为0的数，以他为起点的节点入度减一。
+
+### tag
+
+graph
+
+### 解法
+
+```python
+class Solution(object):
+    def letterCombinations(self, digits):
+        """
+        :type digits: str
+        :rtype: List[str]
+        """
+        if not digits:
+            return []
+        lis = [["a", "b", "c"], ["d", "e", "f"], ["g", "h", "i"], ["j", "k", "l"], ["m", "n", "o"],
+               ["p", "q", "r", 's'], ["t", "u", "v"], ["w", "x", "y", "z"]]
+        res = []
+        part = ""
+        self.dfs(digits, lis, part, res)
+        return res
+
+    def dfs(self, nums, lis, part, res):
+        if not nums:
+            res.append(part)
+        else:
+            num = int(nums[0]) - 2
+            for let in lis[num]:
+                self.dfs(nums[1:], lis, part + let, res)
+```
+
+## 207.  Course Schedule I
+
+### 题目描述
+
+现在你总共有 n 门课需要选，记为 0 到 n-1。
+
+在选修某些课程之前需要一些先修课程。 例如，想要学习课程 0 ，你需要先完成课程 1 ，我们用一个匹配来表示他们: [0,1]
+
+给定课程总量以及它们的先决条件，返回你为了学完所有课程所安排的学习顺序。
+
+可能会有多个正确的顺序，你只要返回一种就可以了。如果不可能完成所有课程，返回一个空数组。
+
+示例 1:
+
+输入: 2, [[1,0]] 
+输出: [0,1]
+解释: 总共有 2 门课程。要学习课程 1，你需要先完成课程 0。因此，正确的课程顺序为 [0,1] 。
+
+### 解题思路
+
+graph，拓扑排序
+
+### tag
+
+Graph
+
+### 解法
+
+```python
+import collections
+class Solution:
+    def canFinish(self, numCourses: int, prerequisites: List[List[int]]) -> bool:
+        G = collections.defaultdict(list)
+        dic = dict((n,0) for n in range(numCourses))
+        for u,v in prerequisites:
+            dic[u]+=1
+            G[v].append(u)
+        zero = [i for i in dic if dic[i]==0]
+        if not zero:
+            return False
+        res = 0
+        while(zero):
+            p = zero.pop()
+            res+=1
+            for v in G[p]:
+                dic[v]-=1
+                if dic[v]==0:
+                    zero.append(v)
+        if res!=numCourses:
+            return False
+        return True
+                
+```
+
+## 207.  Course Schedule II
+
+### 题目描述
+
+现在你总共有 n 门课需要选，记为 0 到 n-1。
+
+在选修某些课程之前需要一些先修课程。 例如，想要学习课程 0 ，你需要先完成课程 1 ，我们用一个匹配来表示他们: [0,1]
+
+给定课程总量以及它们的先决条件，返回你为了学完所有课程所安排的学习顺序。
+
+可能会有多个正确的顺序，你只要返回一种就可以了。如果不可能完成所有课程，返回一个空数组。
+
+示例 1:
+
+输入: 2, [[1,0]] 
+输出: [0,1]
+解释: 总共有 2 门课程。要学习课程 1，你需要先完成课程 0。因此，正确的课程顺序为 [0,1] 。
+
+### 解题思路
+
+graph，拓扑排序
+
+### tag
+
+Graph
+
+### 解法
+
+```python
+class Solution:
+    def findOrder(self, numCourses: int, prerequisites: List[List[int]]) -> List[int]:
+        G = collections.defaultdict(list)
+        dic = dict((n,0) for n in range(numCourses))
+        for u,v in prerequisites:
+            dic[u]+=1
+            G[v].append(u)
+        zero = [i for i in dic if dic[i]==0]
+        if not zero:
+            return []
+        res = []
+        while(zero):
+            p = zero.pop()
+            res.append(p)
+            for v in G[p]:
+                dic[v]-=1
+                if dic[v]==0:
+                    zero.append(v)
+        if len(res)!=numCourses:
+            return []
+        return res        
+```
+
+​	
+
+## 24.  两两交换链表中的节点
+
+### 题目描述
+
+给定一个链表，两两交换其中相邻的节点，并返回交换后的链表。
+
+你不能只是单纯的改变节点内部的值，而是需要实际的进行节点交换。
+
+ 
+
+示例:
+
+给定 1->2->3->4, 你应该返回 2->1->4->3
+
+### 解题思路
+
+遍历
+
+### tag
+
+ListNode
+
+### 解法
+
+```python
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+class Solution:
+    def swapPairs(self, head: ListNode) -> ListNode:
+        dummy = ListNode(0)
+        dummy.next = head
+        self.part(dummy)
+        return dummy.next
+    
+    def part(self,pre):
+        if pre.next and pre.next.next:
+            last = pre.next.next.next
+            p,q = pre.next,pre.next.next
+            pre.next = q
+            p.next = last
+            q.next = p
+            self.part(p)
+        else:
+            return 
+    
+```
+
+## 31.  下一个排列
+
+### 题目描述
+
+实现获取下一个排列的函数，算法需要将给定数字序列重新排列成字典序中下一个更大的排列。
+
+如果不存在下一个更大的排列，则将数字重新排列成最小的排列（即升序排列）。
+
+必须原地修改，只允许使用额外常数空间。
+
+以下是一些例子，输入位于左侧列，其相应输出位于右侧列。
+1,2,3 → 1,3,2
+3,2,1 → 1,2,3
+1,1,5 → 1,5,1
+
+### 解题思路
+
+找到第一个下降的地方，和下降序列中最小的大于他的swap，随后降下降序列reverse
+
+### tag
+
+
+
+### 解法
+
+```python
+class Solution:
+    def nextPermutation(self, nums: List[int]) -> None:
+        """
+        Do not return anything, modify nums in-place instead.
+        """
+        i,j = len(nums)-1,len(nums)-1
+        while(i>0 and nums[i]<=nums[i-1]):
+            i-=1
+        if i==0:
+            self.re(nums,0,j)
+            return
+        while(nums[j]<=nums[i-1]):
+            j-=1
+        temp = nums[i-1]
+        nums[i-1] = nums[j]
+        nums[j] = temp
+        self.re(nums,i,len(nums)-1)
+        
+    def re(self,nums,i,j):
+        while(i<j):
+            temp = nums[i]
+            nums[i] = nums[j]
+            nums[j] = temp
+            i+=1
+            j-=1
+```
+
+## 33.  旋转数组
+
+### 题目描述
+
+假设按照升序排序的数组在预先未知的某个点上进行了旋转。
+
+( 例如，数组 [0,1,2,4,5,6,7] 可能变为 [4,5,6,7,0,1,2] )。
+
+搜索一个给定的目标值，如果数组中存在这个目标值，则返回它的索引，否则返回 -1 。
+
+你可以假设数组中不存在重复的元素。
+
+你的算法时间复杂度必须是 O(log n) 级别。
+
+示例 1:
+
+输入: nums = [4,5,6,7,0,1,2], target = 0
+输出: 4
+
+### 解题思路
+
+找到第一个下降的地方，和下降序列中最小的大于他的swap，随后降下降序列reverse
+
+### tag
+
+
+
+### 解法
+
+```python
+class Solution:
+    def search(self, nums: List[int], target: int) -> int:
+        left,right = 0,len(nums)-1
+        if not nums:
+            return -1
+        while(left<=right):
+            mid = (left+right)//2
+            if target==nums[mid]:
+                return mid
+            if nums[mid]>=nums[left]:
+                if target<=nums[mid] and target>=nums[left]:
+                    right = mid-1
+                else:
+                    left = mid+1
+            else:
+                if target>=nums[mid] and target<=nums[right]:
+                    left = mid+1
+                else:
+                    right = mid-1     
+        return -1
+```
+
+## 33.  旋转数组
+
+### 题目描述
+
+```
+Input: candidates = [10,1,2,7,6,1,5], target = 8,
+A solution set is:
+[
+  [1, 7],
+  [1, 2, 5],
+  [2, 6],
+  [1, 1, 6]
+]
+```
+
+### 解题思路
+
+binary search
+
+### tag
+
+
+
+### 解法
+
+```python
+class Solution:
+    def combinationSum2(self, candidates, target):
+        # Sorting is really helpful, se we can avoid over counting easily
+        candidates.sort()                      
+        result = []
+        self.combine_sum_2(candidates, 0, [], result, target)
+        return result
+
+    def combine_sum_2(self, nums, start, path, result, target):
+        # Base case: if the sum of the path satisfies the target, we will consider 
+        # it as a solution, and stop there
+        if not target:
+            result.append(path)
+            return
+
+        for i in range(start, len(nums)):
+            # Very important here! We don't use `i > 0` because we always want 
+            # to count the first element in this recursive step even if it is the same 
+            # as one before. To avoid overcounting, we just ignore the duplicates
+            # after the first element.
+            if i > start and nums[i] == nums[i - 1]:
+                continue
+
+            # If the current element is bigger than the assigned target, there is 
+            # no need to keep searching, since all the numbers are positive
+            if nums[i] > target:
+                break
+
+            # We change the start to `i + 1` because one element only could
+            # be used once
+            self.combine_sum_2(nums, i + 1, path + [nums[i]], 
+                               result, target - nums[i])
+```
+
+## 46.  全排列
+
+### 题目描述
+
+给定一个没有重复数字的序列，返回其所有可能的全排列。
+
+示例:
+
+输入: [1,2,3]
+输出:
+[
+  [1,2,3],
+  [1,3,2],
+  [2,1,3],
+  [2,3,1],
+  [3,1,2],
+  [3,2,1]
+]
+
+### 解题思路
+
+back tracing
+
+### tag
+
+back tracing
+
+### 解法
+
+```python
+class Solution:
+    def permute(self, nums: List[int]) -> List[List[int]]:
+        res = []
+        self.part(nums,[],res)
+        return res
+    
+    def part(self,nums,lis,res):
+        if not nums:
+            res.append(lis)
+            return
+        for i in range(len(nums)):
+            self.part(nums[:i]+nums[i+1:],lis+[nums[i]],res)
+```
+
+## 图
+
+### 133.克隆图
+
+#### 解题思路：
+
+dic存储旧点与新点的关系，stack存储还未处理完关系的点，如果该点于dic中出现过，就证明做了初始化，直接取即可，否则要重新建立新的点，并且dic添加对应关系，与每个邻居要建立关系。
+
+```python
+"""
+# Definition for a Node.
+class Node(object):
+    def __init__(self, val, neighbors):
+        self.val = val
+        self.neighbors = neighbors
+"""
+class Solution(object):
+    def cloneGraph(self, node):
+        """
+        :type node: Node
+        :rtype: Node
+        """
+        if not node:
+            return 
+        n_copy = Node(node.val,[])
+        dic = {}
+        dic[node] = n_copy
+        stack = [node]
+        while(stack):
+            v = stack.pop()
+            for neighbor in v.neighbors:
+                if neighbor not in dic:
+                    n_copy = Node(neighbor.val,[])
+                    dic[neighbor] = n_copy
+                    dic[v].neighbors.append(n_copy)
+                    stack.append(neighbor)
+                else:
+                    dic[v].neighbors.append(dic[neighbor])
+        return dic[node]
+```
+
+BFS version
+
+用queue，先进先出，层次遍历
+
+```python
+def cloneGraph1(self, node):
+    if not node:
+        return 
+    nodeCopy = UndirectedGraphNode(node.label)
+    dic = {node: nodeCopy}
+    queue = collections.deque([node])
+    while queue:
+        node = queue.popleft()
+        for neighbor in node.neighbors:
+            if neighbor not in dic: # neighbor is not visited
+                neighborCopy = UndirectedGraphNode(neighbor.label)
+                dic[neighbor] = neighborCopy
+                dic[node].neighbors.append(neighborCopy)
+                queue.append(neighbor)
+            else:
+                dic[node].neighbors.append(dic[neighbor])
+    return nodeCopy
+```
+
+
+
+
+
+ 
+
+# 基础算法部分
+
+## 1.拓扑排序
+
+### 算法思路
+
+用字典统计每个点的入度，然后G是key是起点，value是终点的集合，zeros记录入度为0的数组。然后开始一个个pop出zeros中的点，弹出后，对应的这个点为起点的终点，入度减一，如果为0，加入zeros数组。
+
+``` python
+def topsort(G):
+    in_degrees = dict((u, 0) for u in G)
+    for u in G:
+        for v in  G[u]:
+            in_degrees[v] += 1
+                                    # 每一个节点的入度
+    Q = [u for u in G if in_degrees[u] == 0]
+                                    # 入度为 0 的节点
+    S = []
+    while Q:
+        u = Q.pop()
+                                    # 默认从最后一个移除
+        S.append(u)
+        for v in G[u]:
+            in_degrees[v] -= 1
+                                    # 并移除其指向
+            if in_degrees[v] == 0:
+                Q.append(v)
+    return S
+
+G = {
+    'a':'bf',
+    'b':'cdf',
+    'c':'d',
+    'd':'ef',
+    'e':'f',
+    'f':''
+}
+# ['a', 'b', 'c', 'd', 'e', 'f']
+
+def tp(G):
+    indgrees = dict((u,0) for u in G)
+    for u in G:
+        for v in G[u]:
+            indgrees[v]+=1
+    zero = [n for n in indgrees if indgrees[n]==0]
+    res = []
+    while(zero):
+        p = zero.pop()
+        res.append(p)
+        for v in G[p]:
+            indgrees[v]-=1
+            if  indgrees[v]==0:
+                zero.append(v)
+    return res
+
+print(tp(G))
+
+```
+
+## 2.堆
+
+### 算法思路：
+
+#### 1：构造堆数列结构：
+
+主要的部分，max_heapify函数，从最后一个非叶子节点开始遍历，保证他下面包括他的堆结构稳定。
+
+```python
+class Solution(object):
+    def left(self,i):
+        return 2*i+1
+    def right(self,i):
+        return 2*i+2
+    def parent(self,i):
+        return (i-2)>>1
+    def max_heapify(self,nums,i):
+        l,r = self.left(i),self.right(i)
+        if l<len(nums) and nums[l]>nums[i]:
+            largest = l
+        else:
+            largest = i
+        if r<len(nums) and nums[r]>nums[largest]:
+            largest = r
+        if largest!=i:
+            self.swap(nums,i,largest)
+            self.max_heapify(nums,largest)
+    def build_max_heap(self,nums):
+        for i in range((len(nums)-2)>>1,-1,-1):
+            self.max_heapify(nums,i)
+    def swap(self,nums,i,j):
+        temp = nums[i]
+        nums[i] = nums[j]
+        nums[j] = temp
+    def pop_max(self,nums):
+        num = nums[0]
+        nums[0] = nums[-1]
+        nums = nums[:len(nums)-1]
+        self.max_heapify(nums, 0)
+        print(nums)
+        return(num,nums)
+
+sol = Solution()
+lis = [3,5,7,2]
+sol.build_max_heap(lis)
+m,nums = sol.pop_max(lis)
+print(nums)
+# print(4>>1)
+# print(lis[:len(lis)-1])
+```
+
+#### 2：小顶堆，topk：
+
+维持最大的k个，先k个建堆，然后判断最小的是否和新elem更大，否则replace他。
+
+```python
+import sys
+import heapq
+
+class TopHeap(object):
+    def __init__(self,k):
+        self.k = k
+        self.data = []
+
+    def push(self,elem):
+        if len(self.data)<self.k:
+            heapq.heappush(self.data,elem)
+        else:
+            mini = self.data[0]
+            if elem>mini:
+                heapq.heapreplace(self.data,elem)
+
+    def topK(self):
+        return [x for x in reversed([heapq.heappop(self.data) for x in range(len(self.data))])]
+
+
+list_num = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+th = TopHeap(5)
+
+for i in list_num:
+    th.push(i)
+
+# print (th.topK())
+heapq.heapify(list_num)
+print(heapq.heappop(list_num))
+print(heapq.heappop(list_num))
+
+```
+
+## 3.sorted & sort
+
+#### 基本概念
+
+使用sort()方法对list排序会修改list本身,不会返回新list，通常此方法不如sorted()方便，但是如果你不需要保留原来的list，此方法将更有效sort()。
+
+sort()不能对dict字典进行排序。
+
+sorted对原数组不做改变
+
+```python
+my_list = [3, 5, 1, 4, 2]
+result = sorted(my_list)
+result2 = sorted(my_list,reverse=True)
+print (result)
+print(my_list)
+
+#[1, 2, 3, 4, 5]
+#[5, 4, 3, 2, 1]
+#[3, 5, 1, 4, 2]
+```
+
+#### key
+
+``` python
+student_tuples = [
+        ('john', 'A', 15),
+        ('jane', 'B', 12),
+        ('dave', 'B', 10),
+]
+
+print(sorted(student_tuples,key = lambda student:student[2],reverse = True))
+# [('john', 'A', 15), ('jane', 'B', 12), ('dave', 'B', 10)]
+```
+
+dict part
+
+```python
+my_dict = {"a":"2", "c":"5", "b":"1"}
+
+result = sorted(my_dict)
+print(result)
+result2 = sorted(my_dict,key= lambda key:my_dict[key])
+print(result2)
+```
+
+## 4.lambda表达式
+
+```python
+g = lambda x:x+1
+print(g(1))
+# 2
+
+print(list(map(lambda x,y:x+y,[1,3],[2,4])))
+# [3, 7]
+
+li = [11, 22, 33]
+new_list = filter(lambda arg: arg > 22, li)
+print(list(new_list))
+#[33]
+
+
+
 ```
 

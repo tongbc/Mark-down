@@ -122,6 +122,20 @@ Multi-Head Attention中的h和d~v（请通读本文并对照源码）
 
 [遍地开花Attention](https://mp.weixin.qq.com/s/MzHmvbwxFCaFjmMkjfjeSg)
 
+[讲的很清楚的bert 和 trans]https://www.cnblogs.com/xlturing/p/10824400.html
+
+### transformer作用过程
+
+**Transformer 工作流程**
+
+Transformer的工作流程就是上面介绍的每一个子流程的拼接
+
+- 输入的词向量首先叠加上Positional Encoding，然后输入至Transformer内
+- 每个Encoder Transformer会进行一次Multi-head self attention->Add & Normalize->FFN->Add & Normalize流程，然后将输出输入至下一个Encoder中
+- 最后一个Encoder的输出将会作为memory保留
+- 每个Decoder Transformer会进行一次Masked Multi-head self attention->Multi-head self attention->Add & Normalize->FFN->Add & Normalize流程，其中Multi-head self attention时的K、V至来自于Encoder的memory。根据任务要求输出需要的最后一层Embedding。
+- Transformer的输出向量可以用来做各种下游任务
+
 ### 样本不均衡问题
 
 1. 上采样/下采样
@@ -296,11 +310,15 @@ https://zhuanlan.zhihu.com/p/62902811
 
 [LSTM]https://zhuanlan.zhihu.com/p/79064602    https://zhuanlan.zhihu.com/p/39191116
 
+![1570690851740](C:\Users\tbc\AppData\Roaming\Typora\typora-user-images\1570690851740.png)
+
 [torch的坑]https://www.zhihu.com/question/67209417/answer/835804637
 
 [**非常关键的机器学习面试点！！！**]https://zhuanlan.zhihu.com/p/77587367
 
 [归一化和标准化]https://www.jianshu.com/p/95a8f035c86c   https://blog.csdn.net/u010947534/article/details/86632819     https://www.cnblogs.com/chaosimple/p/4153167.html
+
+[推荐系统 文总建议]https://www.zhihu.com/question/342267611/answer/805956104
 
 举一个简单的例子，在KNN中，我们需要计算待分类点与所有实例点的距离。假设每个实例点（instance）由n个features构成。如果我们选用的距离度量为欧式距离，如果数据预先没有经过归一化，那么那些绝对值大的features在欧式距离计算的时候起了决定性作用。
 
@@ -309,3 +327,44 @@ https://zhuanlan.zhihu.com/p/62902811
 **平方损失函数的东西，具体形式可以写成 ![[公式]](https://www.zhihu.com/equation?tex=%5Cfrac%7B1%7D%7B2%7D%5Csum_%7B0%7D%5E%7Bn%7D%7B%7D%28y_%7Bi%7D-F%28x_%7Bi%7D%29%29%5E%7B2%7D) ，熟悉其他算法的原理应该知道，这个损失函数主要针对回归类型的问题，分类则是用熵值类的损失函数。**
 
 [GBDT]https://zhuanlan.zhihu.com/p/29765582
+
+[分词]https://zhuanlan.zhihu.com/p/50444885 
+
+N最短路径分词：在上图中, 边的起点为词的第一个字, 边的终点为词尾的下一个字. 边1表示"我"字单字成词, 边2表示"只是"可以作为一个单词.
+
+每个边拥有一个权值, 表示该词出现的概率. 最简单的做法是采用词频作为权值, 也可以采用TF-IDF值作为权值提高对低频词的分词准确度.
+
+N最短路径分词即在上述有向无环图中寻找N条权值和最大的路径, 路径上的边标志了最可能的分词结果.通常我们只寻找权值和最大的那一条路径.
+
+[牛逼！！非常重要]http://ddrv.cn/a/146186
+
+[word2vec]https://zhuanlan.zhihu.com/p/35074402  https://blog.csdn.net/itplus/article/details/37969979
+
+hierarchical softmax：输出层变成霍夫曼树，更新每次二分的矩阵，cbow就将梯度更新回之前的每个词上
+
+negative sampling：![1570271900204](C:\Users\tbc\AppData\Roaming\Typora\typora-user-images\1570271900204.png)
+
+![1570271958107](C:\Users\tbc\AppData\Roaming\Typora\typora-user-images\1570271958107.png)
+
+[labelEncoding,mean encoding]https://zhuanlan.zhihu.com/p/26308272
+
+1. LabelEncoder编码高基数定性特征，虽然**只需要一列**，但是每个自然数都具有不同的重要意义，对于y而言**线性不可分**。使用简单模型，容易欠拟合（underfit），无法完全捕获不同类别之间的区别；使用复杂模型，容易在其他地方过拟合（overfit）。
+2. OneHotEncoder编码高基数定性特征，必然产生**上万列的稀疏矩阵**，易消耗大量内存和训练时间，除非算法本身有相关优化（例：SVM）。
+
+[FE by Chris]https://www.kaggle.com/c/ieee-fraud-detection/discussion/108575#latest-643395
+
+[梯度消失]https://zhuanlan.zhihu.com/p/28687529
+
+[LSTM解决梯度爆炸&消失]https://zhuanlan.zhihu.com/p/28749444
+
+[机器学习经常问的问题]https://zhuanlan.zhihu.com/p/81253435
+
+[分词]https://zhuanlan.zhihu.com/p/33261835
+
+N-gram  正向最大，反向最大匹配，trie树   [结巴原理]https://www.cnblogs.com/echo-cheng/p/7967221.html
+
+[维特比]https://www.zhihu.com/question/20136144/answer/239971177
+
+[序列标注]https://blog.csdn.net/Jason__Liang/article/details/81772632
+
+https://zhuanlan.zhihu.com/p/79552594		https://zhuanlan.zhihu.com/p/42096344
