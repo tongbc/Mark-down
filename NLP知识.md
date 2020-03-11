@@ -368,3 +368,5 @@ N-gram  正向最大，反向最大匹配，trie树   [结巴原理]https://www.
 [序列标注]https://blog.csdn.net/Jason__Liang/article/details/81772632
 
 https://zhuanlan.zhihu.com/p/79552594		https://zhuanlan.zhihu.com/p/42096344
+
+[bert]https://blog.csdn.net/zwqjoy/article/details/98188386
