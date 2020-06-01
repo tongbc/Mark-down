@@ -62,6 +62,38 @@ class Solution:
         return res
 ```
 
+```python
+### 3月11日复习
+from collections import deque
+class Solution:
+    def maxSlidingWindow(self, nums, k):
+        q = deque([])
+        res = []
+        for i in range(len(nums)):
+            if not q:
+                q.append((i, nums[i]))
+            else:
+                while (True):
+                    if int(len(q))!=0:
+                        p = q[-1]
+                        if p[1] <= nums[i]:
+                            q.pop()
+                        else:
+                            break
+                    else:
+                        break
+                q.append((i, nums[i]))
+            if i - q[0][0] == k:
+                q.popleft()
+            res.append(q[0][1])
+        return res[k - 1:]
+
+sol = Solution()
+print(sol.maxSlidingWindow([1,3,-1,-3,5,3,6,7],3))
+```
+
+
+
 ##  189.旋转数组
 
 ### 题目描述
@@ -519,6 +551,29 @@ class Solution(object):
 dfs,左括号，右括号数量计数
 
 ```python
+##3.20version
+class Solution(object):
+    def generateParenthesis(self, n):
+        """
+        :type n: int
+        :rtype: List[str]
+        """
+        res = []
+        self.dfs(n,0,0,"",res)
+        return res
+        
+    def dfs(self,n,l,r,s,res):
+        if l==n and r==n:
+            res.append(s)
+            return
+        if n>l:
+            self.dfs(n,l+1,r,s+"(",res)
+        if l>r:
+            self.dfs(n,l,r+1,s+")",res)
+        
+            
+
+##old versoin
 class Solution(object):
     def generateParenthesis(self, n):
         """
@@ -2789,6 +2844,32 @@ class Solution:
             return False
         return True
                 
+#2020.3.13 version
+import collections
+class Solution:
+    def canFinish(self, numCourses: int, prerequisites: List[List[int]]) -> bool:
+        G = collections.defaultdict(list)
+        for lis in prerequisites:
+            a,b = lis[0],lis[1]
+            G[a].append(b)
+        in_d = {i:0 for i in range(numCourses)}
+        for k in G:
+            for v in G[k]:
+                in_d[v]+=1
+        zeros = []
+        for k in in_d:
+            if in_d[k]==0:
+                zeros.append(k)
+        while (zeros):
+            g = zeros.pop()
+            for v in G[g]:
+                in_d[v]-=1
+                if in_d[v]==0:
+                    zeros.append(v)
+        for k in in_d:
+            if in_d[k]!=0:
+                return False
+        return True
 ```
 
 ## 207.  Course Schedule II
@@ -3152,7 +3233,7 @@ class Solution:
 
 
 
-## 49.  [ 字母异位词分组
+## 49.  字母异位词分组
 
 ### 题目描述
 
@@ -3182,6 +3263,21 @@ defaultdict,第一种，用数字记录26位，另一种，sorted
 ### 解法
 
 ```python
+from collections import defaultdict
+class Solution(object):
+    def groupAnagrams(self, strs):
+        """
+        :type strs: List[str]
+        :rtype: List[List[str]]
+        """
+        dic = defaultdict(list)
+        for s in strs:
+            temp = "".join(sorted(s))
+            dic[temp].append(s)
+        res = []
+        for k in dic:
+            res.append(dic[k])
+        return res
 import collections
 class Solution:
     def groupAnagrams(self, strs: List[str]) -> List[List[str]]:
@@ -3294,6 +3390,8 @@ public:
 
 1.DP greedy
 
+2.记录当前能到达的最大位置，如果最大位置到不了当前i，返回False，最后遍历完成返回True
+
 ### tag
 
 
@@ -3301,40 +3399,36 @@ public:
 ### 解法
 
 ```python
-#超时version
-class Solution:
-    def canJump(self, nums: List[int]) -> bool:
-        res = [False] * len(nums)
-        res[0] = True
-        maxIdx = 0
-        for i in range(len(nums)-1):
-            if res[i]!=True:
-                continue
-            if maxIdx >= i + nums[i]:
-                continue
-            else:
-                for j in range(maxIdx+1,min(i+nums[i]+1,len(nums))):
-                    res[j] = True
-        return res[-1]
+class Solution(object):
+    def canJump(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: bool
+        """
+        m = 0
+        for i,n in enumerate(nums):
+            if i>m:
+                return False
+            m = max(m,i+nums[i])
+        return True
+```
+
+```java
+class Solution {
+    public boolean canJump(int[] nums) {
+        int m = 0;
+        for(int i=0;i<nums.length;i++){
+            if(i>m){
+                return false;
+            }
+            m = Math.max(m,i+nums[i]);
+        }
+        return true;
+    }
+}
 ```
 
 
-
-```python
-class Solution:
-    def canJump(self, nums: List[int]) -> bool:
-        u,g,b = 0,1,2
-        l = len(nums)
-        res = [u]*l
-        res[l-1]=g
-        for i in range(l-2,-1,-1):
-            for j in range(i+1,min(i+nums[i],l-1)+1):
-                if res[j]==g:
-                    res[i]=g
-                    break
-        
-        return res[0]==g
-```
 
 ## 56.  融合间隔
 
@@ -3689,6 +3783,21 @@ class Solution(object):
 DP
 
 ### 解法	
+
+```python
+## 3/27 version
+class Solution:
+    def numTrees(self, n: int) -> int:
+        dp = [0]*(n+1)
+        dp[0] = 1
+        dp[1] = 1
+        for i in range(2,n+1):
+            for j in range(i):
+                dp[i]+=dp[j]*dp[i-j-1]
+        return dp[-1]
+```
+
+
 
  ```python
 class Solution:
@@ -4353,7 +4462,7 @@ Explanation: 13 = 4 + 9.
 
 ### tag
 
-DFS,BFS
+DFS,BFS,DP
 
 ### code
 
@@ -4393,9 +4502,27 @@ class Solution(object):
                     temp.add(x-y)
             toCheck = temp
         return cnt
+    
+import math
+class Solution:
+    def numSquares(self, n: int) -> int:
+        sqs = [i**2 for i in range(1,int(math.sqrt(n))+1)]
+        l = 0
+        cur = [0]
+        while(True):
+            next_level = []
+            for a in cur:
+                for b in sqs:
+                    if a+b == n:
+                        return l+1
+                    if a+b<n:
+                        next_level.append(a+b)
+            cur = list(set(next_level))
+            l+=1
+        
 ```
 
-## 240. 279. Perfect Squares
+## 240. Search a 2D Matrix II
 
 ### 题目描述
 
@@ -4469,6 +4596,21 @@ class Solution:
             res[i] = res[i] * p
             p = p*nums[i]
         return res
+    
+#3.12 version
+class Solution:
+    def productExceptSelf(self, nums: List[int]) -> List[int]:
+        res = []
+        p = 1
+        l = len(nums)
+        for i in range(l):
+            res.append(p)
+            p = p*nums[i]
+        p = 1
+        for i in range(l-1,-1,-1):
+            res[i] = p * res[i]
+            p = p*nums[i]
+        return res            
 ```
 
 
@@ -5023,6 +5165,53 @@ class Solution:
         return res
 ```
 
+```java
+class Solution {
+    public List<Integer> findAnagrams(String s, String p) {
+        ArrayList<Integer> res = new ArrayList<>();
+        if(s.length()==0||p.length()==0||s.length()<p.length()){
+            return new ArrayList<Integer>();
+        }
+        int[] chars = new int[26];
+        for(Character c:p.toCharArray()){
+            chars[c-'a']++;
+        }
+        int start=0,end =0,len = p.length(),diff=len;
+        char temp;
+        for(end=0;end<len;end++){
+            temp = s.charAt(end);
+            chars[temp-'a']--;
+            if(chars[temp-'a']>=0){
+                diff--;
+            }
+        }
+        if(diff==0){
+            res.add(0);
+        }
+        while(end<s.length()){
+            temp = s.charAt(start);
+            if(chars[temp-'a']>=0){
+                diff++;                
+            }
+            chars[temp-'a']++;
+            start++;
+            temp = s.charAt(end);
+            chars[temp-'a']--;
+            if(chars[temp-'a']>=0){
+                diff--;
+            }
+            if(diff==0){
+                res.add(start);
+            }
+            end++;
+        }
+        return res;
+    }
+}
+```
+
+
+
 ## 437. Path Sum III
 
 ### 题目描述
@@ -5327,18 +5516,13 @@ Output: 2
 4->2
 同样的，我们从下标为0出发，根据f(n)计算出一个值，以这个值为新的下标，再用这个函数计算，以此类推产生一个类似链表一样的序列。
 0->1->3->2->4->2->4->2->……
-
-作者：kirsche
-链接：https://leetcode-cn.com/problems/find-the-duplicate-number/solution/287xun-zhao-zhong-fu-shu-by-kirsche/
-来源：力扣（LeetCode）
-著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
 ```
 
 
 
 ### tag
 
-环，inportant
+环，important
 
 ### code
 
@@ -5363,7 +5547,2962 @@ class Solution:
 
 ```
 
+## 283. Move Zeroes
 
+### 题目描述
+
+```
+Given an array nums, write a function to move all 0's to the end of it while maintaining the relative order of the non-zero elements.
+
+Example:
+
+Input: [0,1,0,3,12]
+Output: [1,3,12,0,0]
+
+```
+
+### 解题思路
+
+```
+记录zero的第一个位置
+```
+
+
+
+### tag
+
+
+
+### code
+
+```python
+class Solution:
+    def moveZeroes(self, nums: List[int]) -> None:
+        """
+        Do not return anything, modify nums in-place instead.
+        """
+        zero = 0
+        for i in range(len(nums)):
+            if nums[i]!=0:
+                nums[i],nums[zero] = nums[zero],nums[i]
+                zero+=1
+```
+
+## 73. Set Matrix Zeroes
+
+### 题目描述
+
+```
+Given a m x n matrix, if an element is 0, set its entire row and column to 0. Do it in-place.
+
+Example 1:
+
+Input: 
+[
+  [1,1,1],
+  [1,0,1],
+  [1,1,1]
+]
+Output: 
+[
+  [1,0,1],
+  [0,0,0],
+  [1,0,1]
+]
+```
+
+### 解题思路
+
+```
+用第一行做标记，第一列辅助，记录第一行是否存在0，最后处理第一行，第一列因为作为辅助，所以循环时候先从最后一列向之前标记
+```
+
+
+
+### tag
+
+
+
+### code
+
+```python
+class Solution:
+    def setZeroes(self, matrix: List[List[int]]) -> None:
+        """
+        Do not return anything, modify matrix in-place instead.
+        """
+        m,n,has_zero = len(matrix),len(matrix[0]),not all(matrix[0])
+        for i in range(1,m):
+            for j in range(n):
+                if matrix[i][j]==0:
+                    matrix[0][j]=matrix[i][0]=0
+        for i in range(1,m):
+            for j in range(n-1,-1,-1):
+                if matrix[0][j]==0 or matrix[i][0]==0:
+                    matrix[i][j]=0
+        if has_zero:
+            matrix[0] = [0]*n
+        return matrix
+```
+
+## 236. Lowest Common Ancestor of a Binary Tree
+
+### 题目描述
+
+```
+Given a binary tree, find the lowest common ancestor (LCA) of two given nodes in the tree.
+
+According to the definition of LCA on Wikipedia: “The lowest common ancestor is defined between two nodes p and q as the lowest node in T that has both p and q as descendants (where we allow a node to be a descendant of itself).”
+
+Given the following binary tree:  root = [3,5,1,6,2,0,8,null,null,7,4]
+```
+
+### 解题思路
+
+```
+搜索到p或者q，return这个节点，如果左和右都不为none，则证明这个节点，为结果，所以return这个节点，如果只有一边有，则一路返回这个节点
+```
+
+### tag
+
+二叉树
+
+### code
+
+```python
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution:
+    def lowestCommonAncestor(self, root: 'TreeNode', p: 'TreeNode', q: 'TreeNode') -> 'TreeNode':
+        if not root:
+            return None
+        if root==p or root==q:
+            return root
+        left,right = None,None
+        if root.left:
+            left = self.lowestCommonAncestor(root.left,p,q)
+        if root.right:
+            right = self.lowestCommonAncestor(root.right,p,q)
+        if left and right:
+            return root
+        else:
+            return left or right
+```
+
+## 221. Maximal Squarer of a Binary Tree
+
+### 题目描述
+
+```
+Given a 2D binary matrix filled with 0's and 1's, find the largest square containing only 1's and return its area.
+
+Example:
+
+Input: 
+
+1 0 1 0 0
+1 0 1 1 1
+1 1 1 1 1
+1 0 0 1 0
+
+Output: 4
+```
+
+### 解题思路
+
+```
+DP,每个点代表以他为右下角，最长的正方形长度，所以这个点和左，上，左上的最小有关,第一排第一列，只看他是否为1，
+
+1 1 1
+1 1 1 
+1 1 1
+
+0 1 1
+1 1 1 
+1 1 1
+```
+
+### tag
+
+二叉树
+
+### code
+
+```python
+class Solution:
+    def maximalSquare(self, matrix: List[List[str]]) -> int:
+        if not matrix:
+            return 0
+        m,n = len(matrix),len(matrix[0])
+        dp = [[0 if matrix[i][j]=="0" else 1 for j in range(n)]for i in range(m)]
+        
+        for i in range(1,m):
+            for j in range(1,n):
+                if matrix[i][j] == "1":
+                    dp[i][j] = min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1])+1
+                else:
+                    dp[i][j] = 0
+        res = max(max(row) for row in dp)
+        return res ** 2
+```
+
+## 215. Kth Largest Element in an Array
+
+### 题目描述
+
+```
+Find the kth largest element in an unsorted array. Note that it is the kth largest element in the sorted order, not the kth distinct element.
+
+Example 1:
+
+Input: [3,2,1,5,6,4] and k = 2
+Output: 5
+Example 2:
+
+Input: [3,2,3,1,2,4,5,5,6] and k = 4
+Output: 4
+```
+
+### 解题思路
+
+```
+快排思想，找柱子，柱子位置对了，就对，根据柱子位置二分，注意，一定要加随机
+```
+
+### tag
+
+快速排序
+
+### code
+
+```python
+from random import randint
+class Solution:
+    def findKthLargest(self, nums: List[int], k: int) -> int:
+        low,high = 0,len(nums)-1
+        while low<=high:
+            mid = self.part(nums,low,high)
+            if mid<len(nums)-k:
+                low = mid +1
+            elif mid>len(nums)-k:
+                high = mid-1
+            else:
+                return nums[mid]
+        
+        
+    
+    def part(self,nums,a,b):
+        rr = randint(a,b)
+        nums[b],nums[rr] = nums[rr],nums[b]
+        mid = nums[b]
+        mark = a
+        for i in range(a,b):
+            if nums[i]<mid:
+                temp = nums[i]
+                nums[i] = nums[mark]
+                nums[mark] = temp
+                mark += 1
+        temp = mid
+        nums[b] = nums[mark]
+        nums[mark] = temp
+        return mark      
+                
+```
+
+## 200. Number of Islands
+
+### 题目描述
+
+```
+Example 1:
+
+Input:
+11110
+11010
+11000
+00000
+
+Output: 1
+Example 2:
+
+Input:
+11000
+11000
+00100
+00011
+
+Output: 3
+```
+
+### 解题思路
+
+```
+每部分第一次见到1，将其他标-1
+```
+
+### tag
+
+dfs
+
+### code
+
+```python
+class Solution:
+    def numIslands(self, grid: List[List[str]]) -> int:
+        res = 0
+        for i in range(len(grid)):
+            for j in range(len(grid[0])):
+                if grid[i][j]=="1":
+                    res+=1
+                    self.part(grid,i,j)
+        return res
+        
+    def part(self,grid,i,j):
+        if i<0 or i>=len(grid) or j<0 or j>=len(grid[0]):
+            return
+        if grid[i][j]=="1":
+            grid[i][j] = "-1"
+            self.part(grid,i-1,j)
+            self.part(grid,i,j-1)
+            self.part(grid,i+1,j)
+            self.part(grid,i,j+1)
+    
+```
+
+## 152. Maximum Product Subarray
+
+### 题目描述
+
+```
+Given an integer array nums, find the contiguous subarray within an array (containing at least one number) which has the largest product.
+
+Example 1:
+
+Input: [2,3,-2,4]
+Output: 6
+Explanation: [2,3] has the largest product 6.
+```
+
+### 解题思路
+
+```
+当前最大最小，记住，如果num小于0，更换当前最大最小，因为要换号
+```
+
+### tag
+
+
+
+### code
+
+```python
+class Solution:
+    def maxProduct(self, nums: List[int]) -> int:
+        iMax,iMin,res = nums[0],nums[0],nums[0]
+        for num in nums[1:]:
+            #如果num小于0，必须更换min max，因为换号
+            if num<0:
+                iMax,iMin = iMin,iMax
+            iMax = max(iMax*num,num)
+            iMin = min(iMin*num,num)
+            res = max(res,iMax)
+        return res
+```
+
+## 148. Sort List
+
+### 题目描述
+
+```
+Sort a linked list in O(n log n) time using constant space complexity.
+
+Example 1:
+
+Input: 4->2->1->3
+Output: 1->2->3->4
+```
+
+### 解题思路
+
+```
+1.归并  （空间复杂度O(n)）
+2.非递归归并
+```
+
+### tag
+
+
+
+### code
+
+```python
+#1归并
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+class Solution:
+    def sortList(self, head: ListNode) -> ListNode:
+        if not head or not head.next:
+            return head
+        slow,fast = head,head.next
+        while(fast.next and fast.next.next):
+            slow = slow.next
+            fast = fast.next.next
+        mid = slow.next
+        slow.next= None
+        left = self.sortList(head)
+        right = self.sortList(mid)
+        res = h = ListNode(0)
+        while(left and right):
+            if left.val<right.val:
+                h.next = left
+                left = left.next
+            else:
+                h.next = right
+                right = right.next
+            h = h.next
+        if left:
+            h.next = left
+        if right:
+            h.next = right
+        return res.next
+    
+#important
+class Solution:
+    def sortList(self, head: ListNode) -> ListNode:
+        h, length, intv = head, 0, 1
+        while h: h, length = h.next, length + 1
+        res = ListNode(0)
+        res.next = head
+        # merge the list in different intv.
+        while intv < length:
+            pre, h = res, res.next
+            while h:
+                # get the two merge head `h1`, `h2`
+                h1, i = h, intv
+                while i and h: h, i = h.next, i - 1
+                if i: break # no need to merge because the `h2` is None.
+                h2, i = h, intv
+                while i and h: h, i = h.next, i - 1
+                c1, c2 = intv, intv - i # the `c2`: length of `h2` can be small than the `intv`.
+                # merge the `h1` and `h2`.
+                while c1 and c2:
+                    if h1.val < h2.val: pre.next, h1, c1 = h1, h1.next, c1 - 1
+                    else: pre.next, h2, c2 = h2, h2.next, c2 - 1
+                    pre = pre.next
+                pre.next = h1 if c1 else h2
+                while c1 > 0 or c2 > 0: pre, c1, c2 = pre.next, c1 - 1, c2 - 1
+                pre.next = h 
+            intv *= 2
+        return res.next
+
+```
+
+## 146. LRU Cache
+
+### 题目描述
+
+```
+运用你所掌握的数据结构，设计和实现一个  LRU (最近最少使用) 缓存机制。它应该支持以下操作： 获取数据 get 和 写入数据 put 。
+
+获取数据 get(key) - 如果密钥 (key) 存在于缓存中，则获取密钥的值（总是正数），否则返回 -1。
+写入数据 put(key, value) - 如果密钥不存在，则写入其数据值。当缓存容量达到上限时，它应该在写入新数据之前删除最久未使用的数据值，从而为新的数据值留出空间。
+
+进阶:
+
+你是否可以在 O(1) 时间复杂度内完成这两种操作？
+
+示例:
+
+LRUCache cache = new LRUCache( 2 /* 缓存容量 */ );
+
+cache.put(1, 1);
+cache.put(2, 2);
+cache.get(1);       // 返回  1
+cache.put(3, 3);    // 该操作会使得密钥 2 作废
+cache.get(2);       // 返回 -1 (未找到)
+cache.put(4, 4);    // 该操作会使得密钥 1 作废
+cache.get(1);       // 返回 -1 (未找到)
+cache.get(3);       // 返回  3
+cache.get(4);       // 返回  4
+```
+
+### 解题思路
+
+```
+字典，双向链表
+```
+
+### tag
+
+important
+
+### code
+
+```python
+class Node:
+    def __init__(self,k,v):
+        self.k = k
+        self.v = v
+        self.pre = None
+        self.next= None
+
+class LRUCache:
+
+    def __init__(self, capacity: int):
+        self.head = Node(0,0)
+        self.tail = Node(0,0)
+        self.cap = capacity
+        self.dic = dict()
+        self.head.next = self.tail
+        self.tail.pre = self.head
+
+    def get(self, key: int) -> int:
+        if key in self.dic:
+            n = self.dic[key]
+            self._remove(n)
+            self._add(n)
+            return n.v
+        return -1
+
+    def put(self, key: int, value: int) -> None:
+        if key in self.dic:
+            self._remove(self.dic[key])
+        n = Node(key,value)
+        self._add(n)
+        self.dic[key] = n
+        if len(self.dic)>self.cap:
+            p = self.head.next
+            self._remove(p)
+            del self.dic[p.k]
+
+    def _remove(self, node):
+        p = node.pre
+        q = node.next
+        p.next = q
+        q.pre = p
+        
+    def _add(self,node):
+        p = self.tail.pre
+        p.next = node
+        node.next = self.tail
+        node.pre = p
+        self.tail.pre = node
+
+# Your LRUCache object will be instantiated and called as such:
+# obj = LRUCache(capacity)
+# param_1 = obj.get(key)
+# obj.put(key,value)
+```
+
+## 142. 环形链表 II
+
+### 题目描述
+
+```
+给定一个链表，返回链表开始入环的第一个节点。 如果链表无环，则返回 null。
+
+为了表示给定链表中的环，我们使用整数 pos 来表示链表尾连接到链表中的位置（索引从 0 开始）。 如果 pos 是 -1，则在该链表中没有环。
+
+说明：不允许修改给定的链表。
+
+ 
+
+示例 1：
+
+输入：head = [3,2,0,-4], pos = 1
+输出：tail connects to node index 1
+解释：链表中有一个环，其尾部连接到第二个节点。
+```
+
+### 解题思路
+
+![image-20200315202007035](C:\Users\tbc\AppData\Roaming\Typora\typora-user-images\image-20200315202007035.png)
+
+```
+
+```
+
+### tag
+
+important
+
+### code
+
+```python
+class Solution:
+    def detectCycle(self, head):
+        #第一次相遇
+        try:
+            fast = head.next
+            slow = head
+            while fast is not slow:
+                fast = fast.next.next
+                slow = slow.next
+        except:
+            return None
+        #第二次相遇 F = b
+
+        slow = slow.next
+        while head is not slow:
+            head = head.next
+            slow = slow.next
+
+        return head
+```
+
+## 138. Copy List with Random Pointer
+
+### 题目描述
+
+```
+给定一个链表，每个节点包含一个额外增加的随机指针，该指针可以指向链表中的任何节点或空节点。
+
+要求返回这个链表的 深拷贝。 
+
+我们用一个由 n 个节点组成的链表来表示输入/输出中的链表。每个节点用一个 [val, random_index] 表示：
+
+val：一个表示 Node.val 的整数。
+random_index：随机指针指向的节点索引（范围从 0 到 n-1）；如果不指向任何节点，则为  null 。
+```
+
+### 解题思路
+
+```
+1.递归，每次处理好每个节点，用dic存储新旧节点的对应关系
+2.交错方法，将copy放在每个原节点右边
+```
+
+### tag
+
+
+
+### code
+
+```python
+"""
+# Definition for a Node.
+class Node:
+    def __init__(self, x: int, next: 'Node' = None, random: 'Node' = None):
+        self.val = int(x)
+        self.next = next
+        self.random = random
+"""
+class Solution:
+    def __init__(self):
+        #记录旧节点->新节点
+        self.dic = {}
+    def copyRandomList(self, head: 'Node') -> 'Node':
+        if head == None:
+            return None
+        if head in self.dic:
+            return self.dic[head]
+        node = Node(head.val)
+        self.dic[head] = node
+        node.next = self.copyRandomList(head.next)
+        node.random = self.copyRandomList(head.random)
+        return node
+    
+#version1 
+"""
+# Definition for a Node.
+class Node:
+    def __init__(self, x: int, next: 'Node' = None, random: 'Node' = None):
+        self.val = int(x)
+        self.next = next
+        self.random = random
+"""
+class Solution:
+    def copyRandomList(self, head: 'Node') -> 'Node':
+        if not head:
+            return None
+        dumb = Node(0,head,None)
+        while(head):
+            q = head.next
+            cp = Node(head.val,q)
+            head.next = cp
+            head = q
+        head = dumb.next
+        while(head and head.next):
+            head.next.random = head.random.next if head.random else None
+            head = head.next.next
+        head=dumb.next.next
+        dumb.next = head
+        while(head and head.next):
+            head.next = head.next.next
+            head = head.next
+        while(head):
+            print(head.val)
+            head=head.next
+        return dumb.next
+```
+
+## 128. Longest Consecutive Sequence
+
+### 题目描述
+
+```
+Given an unsorted array of integers, find the length of the longest consecutive elements sequence.
+
+Your algorithm should run in O(n) complexity.
+
+Example:
+
+Input: [100, 4, 200, 1, 3, 2]
+Output: 4
+Explanation: The longest consecutive elements sequence is [1, 2, 3, 4]. Therefore its length is 4.
+```
+
+### 解题思路
+
+```
+变成set，随后找到每个片最左端，递增寻找最右，算出长度
+```
+
+### tag
+
+
+
+### code
+
+```python
+class Solution:
+    def longestConsecutive(self, nums: List[int]) -> int:
+        s = set(nums)
+        best = 0
+        for num in s:
+            if num-1 not in s:
+                y = num+1
+                while(y in s):
+                    y+=1
+                print(y,num)
+                best = max(best,y-num)
+        return best
+```
+
+## 79. Word Search	
+
+### 题目描述
+
+```
+Given a 2D board and a word, find if the word exists in the grid.
+
+The word can be constructed from letters of sequentially adjacent cell, where "adjacent" cells are those horizontally or vertically neighboring. The same letter cell may not be used more than once.
+
+Example:
+
+board =
+[
+  ['A','B','C','E'],
+  ['S','F','C','S'],
+  ['A','D','E','E']
+]
+
+Given word = "ABCCED", return true.
+Given word = "SEE", return true.
+Given word = "ABCB", return false
+```
+
+### 解题思路
+
+```
+dfs,先#标注，dfs结束再标回来
+```
+
+### tag
+
+DFS
+
+### code
+
+```python
+class Solution:
+    def exist(self, board, word):
+        if not board:
+            return False
+        for i in range(len(board)):
+            for j in range(len(board[0])):
+                if self.dfs(board, i, j, word):
+                    return True
+        return False
+
+    def dfs(self, board, i, j, word):
+        if len(word) == 0:
+            return True
+        if i<0 or i>=len(board) or j<0 or j>=len(board[0]) or word[0]!=board[i][j]:
+            return False
+        tmp = board[i][j]
+        board[i][j] = "#"
+        res = self.dfs(board, i+1, j, word[1:]) or self.dfs(board, i-1, j, word[1:]) \
+        or self.dfs(board, i, j+1, word[1:]) or self.dfs(board, i, j-1, word[1:])
+        board[i][j] = tmp
+        return res
+```
+
+## 78. Subsets	
+
+### 题目描述
+
+```
+Given a set of distinct integers, nums, return all possible subsets (the power set).
+
+Note: The solution set must not contain duplicate subsets.
+
+Example:
+
+Input: nums = [1,2,3]
+Output:
+[
+  [3],
+  [1],
+  [2],
+  [1,2,3],
+  [1,3],
+  [2,3],
+  [1,2],
+  []
+]
+```
+
+### 解题思路
+
+```
+dfs,先排序
+```
+
+### tag
+
+DFS
+
+### code
+
+```python
+class Solution:
+    def subsets(self, nums: List[int]) -> List[List[int]]:
+        res = []
+        self.dfs(nums,0,[],res)
+        return res
+        
+        
+    def dfs(self,nums,index,path,res):
+        res.append(path)
+        for i in range(index,len(nums)):
+            self.dfs(nums,i+1,path+[nums[i]],res)
+```
+
+## 76. Minimum Window Substring
+
+### 题目描述
+
+```
+Given a string S and a string T, find the minimum window in S which will contain all the characters in T in complexity O(n).
+
+Example:
+
+Input: S = "ADOBECODEBANC", T = "ABC"
+Output: "BANC"
+```
+
+### 解题思路
+
+```
+Counter，找到从i到j合格的位置，随后从i开始向右检测，将所有不需要的退出去，当前的j-i，是一个距离，随后i变成i+1,又将不稳定，继续循环校验
+```
+
+### tag
+
+
+
+### code
+
+```python
+from collections import Counter
+class Solution(object):
+    def minWindow(self, s, t):
+        """
+        :type s: str
+        :type t: str
+        :rtype: str
+        """
+        start,end = 0,0
+        i = 0
+        need = Counter(t)
+        missing = len(t)
+        for j,char in enumerate(s,1):
+            if need[char]>0:
+                missing-=1
+            need[char]-=1
+            if missing==0:
+                while i<j and need[s[i]]<0:
+                    need[s[i]]+=1
+                    i+=1
+                need[s[i]]+=1
+                missing+=1
+                if end == 0 or j-i < end-start:  #update window
+                    start, end = i, j
+                i += 1                           #update i to start+1 for next window
+        return s[start:end]
+```
+
+## 75. Sort Colors
+
+### 题目描述
+
+```
+Given an array with n objects colored red, white or blue, sort them in-place so that objects of the same color are adjacent, with the colors in the order red, white and blue.
+
+Here, we will use the integers 0, 1, and 2 to represent the color red, white, and blue respectively.
+
+Note: You are not suppose to use the library's sort function for this problem.
+
+Example:
+
+Input: [2,0,2,1,1,0]
+Output: [0,0,1,1,2,2]
+```
+
+### 解题思路
+
+```
+r,w,b三个颜色，r w是颜色下一位，b是颜色上一位，w和b小于等于之前，都在遍历
+```
+
+### tag
+
+
+
+### code
+
+```python
+class Solution(object):
+    def sortColors(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: None Do not return anything, modify nums in-place instead.
+        """
+        # red white blue  red white ->  blue -< 
+        r,w,b = 0,0,len(nums)-1
+        while(w<=b):
+            if nums[w] == 0:
+                nums[r],nums[w] = nums[w],nums[r]
+                r+=1
+                w+=1
+            elif nums[w] == 2:
+                nums[w],nums[b] = nums[b],nums[w]
+                b-=1
+            else:
+                w+=1
+        return nums
+```
+
+## 72. Edit Distance
+
+### 题目描述
+
+```
+Given two words word1 and word2, find the minimum number of operations required to convert word1 to word2.
+
+You have the following 3 operations permitted on a word:
+
+Insert a character
+Delete a character
+Replace a character
+Example 1:
+
+Input: word1 = "horse", word2 = "ros"
+Output: 3
+Explanation: 
+horse -> rorse (replace 'h' with 'r')
+rorse -> rose (remove 'r')
+rose -> ros (remove 'e')
+```
+
+### 解题思路
+
+```
+DP，dp[i][j]意思i长度的word1和j长度的word2的编辑距离，分两种情况，i-1 j-1单词相等，和不相等
+```
+
+### tag
+
+DP
+
+### code
+
+```python
+class Solution:
+    def minDistance(self, word1: str, word2: str) -> int:
+        m,n = len(word1),len(word2)
+        dp = [[0 for _ in range(n+1)]for _ in range(m+1)]
+        for i in range(m + 1):
+            dp[i][0] = i
+        for j in range(n + 1):
+            dp[0][j] = j
+        for i in range(1,m+1):
+            for j in range(1,n+1):
+                if word1[i-1] == word2[j-1]:
+                    dp[i][j] = min(dp[i-1][j]+1,dp[i-1][j-1],dp[i][j-1]+1)
+                else:
+                    dp[i][j] = min(dp[i-1][j]+1,dp[i][j-1]+1,dp[i-1][j-1]+1)
+        return dp[m][n]
+```
+
+## 70. Climbing Stairs
+
+### 题目描述
+
+```
+You are climbing a stair case. It takes n steps to reach to the top.
+
+Each time you can either climb 1 or 2 steps. In how many distinct ways can you climb to the top?
+
+Note: Given n will be a positive integer.
+
+Example 1:
+
+Input: 2
+Output: 2
+Explanation: There are two ways to climb to the top.
+1. 1 step + 1 step
+2. 2 steps
+```
+
+### 解题思路
+
+```
+fibonacci
+```
+
+### tag
+
+DP
+
+### code
+
+```java
+class Solution {
+    public int climbStairs(int n) {
+        if(n==1||n==2){
+            return n;
+        }
+        int a = 1;
+        int b = 2;
+        int temp = 0;
+        for(int i=3;i<=n;i++){
+            temp = b;
+            b = a+b;
+            a = temp;
+        }
+        return b;
+    }
+}
+```
+
+## 91. Decode Ways
+
+### 题目描述
+
+```
+A message containing letters from A-Z is being encoded to numbers using the following mapping:  'A' -> 1 'B' -> 2 ... 'Z' -> 26
+```
+
+### 解题思路
+
+```
+dp
+```
+
+### tag
+
+DP
+
+### code
+
+```python
+class Solution:
+    def numDecodings(self, s: str) -> int:
+        if s=="0":
+            return 0
+        if len(s) ==1 :
+            return 1
+        dp = [0] * (len(s)+1)
+        dp[0] = 1
+        dp[1] = 0 if s[0] == "0" else 1
+        for i in range(2,len(s)+1):
+            a,b = int(s[i-1:i]),int(s[i-2:i])
+            if a<=9 and a>=1:
+                dp[i]+=dp[i-1]
+            if b < 27 and b>=10:
+                dp[i]+=dp[i-2]
+        return dp[-1]
+```
+
+## 64. Minimum Path Sum
+
+### 题目描述
+
+```
+Given a m x n grid filled with non-negative numbers, find a path from top left to bottom right which minimizes the sum of all numbers along its path.
+
+Note: You can only move either down or right at any point in time.
+
+Example:
+
+Input:
+[
+  [1,3,1],
+  [1,5,1],
+  [4,2,1]
+]
+Output: 7
+Explanation: Because the path 1→3→1→1→1 minimizes the sum.
+```
+
+### 解题思路
+
+```
+dp
+```
+
+### tag
+
+DP
+
+### code
+
+```python
+class Solution(object):
+    def minPathSum(self, grid):
+        """
+        :type grid: List[List[int]]
+        :rtype: int
+        """
+        m,n = len(grid),len(grid[0])
+        dp = [[0]*n for _ in range(m)]
+        dp[0][0] = grid[0][0]
+        for i in range(1,m):
+            dp[i][0] = dp[i-1][0] + grid[i][0]
+        for i in range(1,n):
+            dp[0][i] = dp[0][i-1] + grid[0][i]
+        for i in range(1,m):
+            for j in range(1,n):
+                dp[i][j] = min(dp[i-1][j],dp[i][j-1])+grid[i][j]
+        return dp[m-1][n-1]
+```
+
+```java
+class Solution {
+    public int minPathSum(int[][] grid) {
+        int m = grid.length;
+        int n = grid[0].length;
+        int[][] dp = new int[m][n];
+        dp[0][0] = grid[0][0];
+        for(int i=1;i<m;i++){
+            dp[i][0] = dp[i-1][0] + grid[i][0];
+        }
+        for(int i=1;i<n;i++){
+            dp[0][i] = dp[0][i-1] + grid[0][i];
+        }
+        for(int i=1;i<m;i++){
+            for(int j=1;j<n;j++){
+                dp[i][j] = Math.min(dp[i-1][j],dp[i][j-1]) + grid[i][j];
+            }
+        }
+        return dp[m-1][n-1];
+    }
+}
+```
+
+## 62. Unique Paths
+
+### 题目描述
+
+```
+A robot is located at the top-left corner of a m x n grid (marked 'Start' in the diagram below).
+
+The robot can only move either down or right at any point in time. The robot is trying to reach the bottom-right corner of the grid (marked 'Finish' in the diagram below).
+
+How many possible unique paths are there?
+```
+
+### 解题思路
+
+```
+dp
+```
+
+### tag
+
+DP
+
+### code
+
+```java
+class Solution {
+    public int uniquePaths(int m, int n) {
+        int[][] dp = new int[m][n];
+        dp[0][0] = 1;
+        for(int i=1;i<m;i++){
+            dp[i][0] = 1;
+        }
+        for(int i=1;i<n;i++){
+            dp[0][i] = 1;
+        }
+        for(int i=1;i<m;i++){
+            for(int j=1;j<n;j++){
+                dp[i][j] = dp[i-1][j] + dp[i][j-1];
+            }
+        }
+        return dp[m-1][n-1];
+    }
+}
+```
+
+## 56. Merge Intervals
+
+### 题目描述
+
+```
+Given a collection of intervals, merge all overlapping intervals.
+
+Example 1:
+
+Input: [[1,3],[2,6],[8,10],[15,18]]
+Output: [[1,6],[8,10],[15,18]]
+Explanation: Since intervals [1,3] and [2,6] overlaps, merge them into [1,6].
+```
+
+### 解题思路
+
+```
+sorted根据第一位，然后挨个判断
+```
+
+### tag
+
+
+
+### code
+
+```python
+class Solution:
+    def merge(self, intervals: List[List[int]]) -> List[List[int]]:
+        if not intervals:
+            return []
+        lis = sorted(intervals,key=lambda x:x[0])
+        res= [lis[0]]
+        for index,(a,b) in enumerate(lis[1:]):
+            if a<=res[-1][1]:
+                if b>res[-1][1]:
+                    res[-1][1] = b
+            else:
+                res.append([a,b])
+        return res
+```
+
+
+
+```java
+class Solution {
+    public int[][] merge(int[][] intervals) {
+        if(intervals.length<=1){
+            return intervals;
+        }
+        Arrays.sort(intervals,(i1,i2)->Integer.compare(i1[0],i2[0]));
+        List<int[]> res= new ArrayList<>();
+        int[] newI = intervals[0];
+        res.add(newI);
+        for(int[] temp:intervals){
+            if(newI[1]>=temp[0]){
+                newI[1] = Math.max(newI[1],temp[1]);
+            }else{
+                newI = temp;
+                res.add(newI);
+            }
+        }
+        return res.toArray(new int[res.size()][]);
+    }
+}
+```
+
+## 45. Jump Game II
+
+### 题目描述
+
+```
+Given an array of non-negative integers, you are initially positioned at the first index of the array.
+
+Each element in the array represents your maximum jump length at that position.
+
+Your goal is to reach the last index in the minimum number of jumps.
+
+Example:
+
+Input: [2,3,1,1,4]
+Output: 2
+Explanation: The minimum number of jumps to reach the last index is 2.
+    Jump 1 step from index 0 to 1, then 3 steps to the last index
+```
+
+### 解题思路
+
+```
+1.dp,o(n^2)
+2.类似层次加贪婪
+```
+
+### tag
+
+greedy
+
+### code
+
+```python
+class Solution(object):
+    def jump(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        end = 0
+        m = 0
+        res = 0
+        for i in range(len(nums)-1):
+            m = max(m,i+nums[i])
+            if i==end:
+                res+=1
+                end = m
+        return res
+```
+
+
+
+```python
+###超时version
+
+class Solution(object):
+    def jump(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        dp = ([0]*len(nums))
+        for i,num in enumerate(nums[:-1]):
+            if num==0:
+                continue
+            else:
+                m = min(i+1+num,len(nums))
+                for j in range(i+1,m):
+                    if dp[j]==0:
+                        dp[j] = dp[i]+1
+                    else:
+                        dp[j] = min(dp[i]+1,dp[j])
+        return dp[-1]
+                    
+            
+```
+
+## 39. Combination Sum
+
+### 题目描述
+
+```
+Input: candidates = [2,3,6,7], target = 7,
+A solution set is:
+[
+  [7],
+  [2,2,3]
+]
+```
+
+### 解题思路
+
+```
+dfs
+```
+
+### tag
+
+dfs
+
+### code
+
+```python
+class Solution(object):
+    def combinationSum(self, candidates, target):
+        """
+        :type candidates: List[int]
+        :type target: int
+        :rtype: List[List[int]]
+        """
+        res = []
+        candidates.sort()
+        self.dfs(candidates,[],0,target,res)
+        return res
+        
+    def dfs(self,cand,lis,index,target,res):
+        if target==0:
+            res.append(lis)
+            return
+        if target<0:
+            return
+        if not cand:
+            return
+        for i in range(index,len(cand)):
+            self.dfs(cand,lis+[cand[i]],i,target-cand[i],res)
+            
+            
+```
+
+## 34. Find First and Last Position of Element in Sorted Array
+
+### 题目描述
+
+```
+Input: nums = [5,7,7,8,8,10], target = 8
+Output: [3,4]
+Example 2:
+
+Input: nums = [5,7,7,8,8,10], target = 6
+Output: [-1,-1]
+```
+
+### 解题思路
+
+```
+分别寻找左右点，注意，寻找左侧时候，大于或者相当，left都是mid-1，当leftright相等时候，还要判断一次，如果当前小于那个，往右挪一位置
+```
+
+### tag
+
+binary
+
+### code
+
+```python
+class Solution(object):
+    def searchRange(self, nums, target):
+        def binarySearchLeft(A, x):
+            left, right = 0, len(A) - 1
+            while left <= right:
+                mid = (left + right) / 2
+                if x > A[mid]: left = mid + 1
+                else: right = mid - 1
+            return left
+
+        def binarySearchRight(A, x):
+            left, right = 0, len(A) - 1
+            while left <= right:
+                mid = (left + right) / 2
+                if x >= A[mid]: left = mid + 1
+                else: right = mid - 1
+            return right
+
+        left, right = binarySearchLeft(nums, target), binarySearchRight(nums, target)
+        return (left, right) if left <= right else [-1, -1]
+```
+
+## 33. Search in Rotated Sorted Array
+
+### 题目描述
+
+```
+Example 1:
+
+Input: nums = [4,5,6,7,0,1,2], target = 0
+Output: 4
+Example 2:
+
+Input: nums = [4,5,6,7,0,1,2], target = 3
+Output: -1
+```
+
+### 解题思路
+
+```
+判断左边有序or右边有序，每次二分
+```
+
+### tag
+
+binary
+
+### code
+
+```python
+class Solution(object):
+    def search(self, nums, target):
+        """
+        :type nums: List[int]
+        :type target: int
+        :rtype: int
+        """
+        low,high = 0,len(nums)-1
+        while(low<=high):
+            mid = int((low+high)/2)
+            #左侧有序
+            if nums[mid] == target:
+                return mid
+            if nums[low] <= nums[mid]:
+                if nums[low] <= target <= nums[mid]:
+                    high = mid - 1
+                else:
+                    low = mid + 1
+            else:
+                if nums[mid] <= target <= nums[high]:
+                    low = mid + 1
+                else:
+                    high = mid - 1
+        return -1
+```
+
+## 21. Merge Two Sorted Lists
+
+### 题目描述
+
+```
+Merge two sorted linked lists and return it as a new list. The new list should be made by splicing together the nodes of the first two lists.
+
+Example:
+
+Input: 1->2->4, 1->3->4
+Output: 1->1->2->3->4->4
+```
+
+### 解题思路
+
+```
+
+```
+
+### tag
+
+ListNode
+
+### code
+
+```python
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+class Solution(object):
+    def mergeTwoLists(self, l1, l2):
+        """
+        :type l1: ListNode
+        :type l2: ListNode
+        :rtype: ListNode
+        """
+        if not l1 and not l2:
+            return None
+        dumb  = ListNode(0)
+        cur = dumb
+        while(l1 and l2):
+            if l1.val<l2.val:
+                cur.next = l1
+                l1= l1.next
+                cur = cur.next
+            else:
+                cur.next = l2
+                l2=l2.next
+                cur = cur.next
+        if l1:
+            cur.next = l1
+        if l2:
+            cur.next = l2
+        return dumb.next
+```
+
+## 19. Remove Nth Node From End of List
+
+### 题目描述
+
+```
+Given a linked list, remove the n-th node from the end of list and return its head.
+
+Example:
+
+Given linked list: 1->2->3->4->5, and n = 2.
+
+After removing the second node from the end, the linked list becomes 1->2->3->5.
+```
+
+### 解题思路
+
+```
+b先往后走n个
+```
+
+### tag
+
+ListNode
+
+### code
+
+```python
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+class Solution(object):
+    def removeNthFromEnd(self, head, n):
+        """
+        :type head: ListNode
+        :type n: int
+        :rtype: ListNode
+        """
+        dumb = ListNode(0)
+        dumb.next = head
+        b = dumb
+        for _ in range(n):
+            b = b.next
+        a = dumb
+        while(b.next):
+            a = a.next
+            b = b.next
+        temp = a.next.next
+        a.next = temp
+        return dumb.next
+```
+
+## 983. 最低票价
+
+### 题目描述
+
+```
+在一个火车旅行很受欢迎的国度，你提前一年计划了一些火车旅行。在接下来的一年里，你要旅行的日子将以一个名为 days 的数组给出。每一项是一个从 1 到 365 的整数。
+
+火车票有三种不同的销售方式：
+
+一张为期一天的通行证售价为 costs[0] 美元；
+一张为期七天的通行证售价为 costs[1] 美元；
+一张为期三十天的通行证售价为 costs[2] 美元。
+通行证允许数天无限制的旅行。 例如，如果我们在第 2 天获得一张为期 7 天的通行证，那么我们可以连着旅行 7 天：第 2 天、第 3 天、第 4 天、第 5 天、第 6 天、第 7 天和第 8 天。
+
+返回你想要完成在给定的列表 days 中列出的每一天的旅行所需要的最低消费。
+
+ 
+
+示例 1：
+
+输入：days = [1,4,6,7,8,20], costs = [2,7,15]
+输出：11
+解释： 
+例如，这里有一种购买通行证的方法，可以让你完成你的旅行计划：
+在第 1 天，你花了 costs[0] = $2 买了一张为期 1 天的通行证，它将在第 1 天生效。
+在第 3 天，你花了 costs[1] = $7 买了一张为期 7 天的通行证，它将在第 3, 4, ..., 9 天生效。
+在第 20 天，你花了 costs[0] = $2 买了一张为期 1 天的通行证，它将在第 20 天生效。
+你总共花了 $11，并完成了你计划的每一天旅行。
+示例 2：
+
+输入：days = [1,2,3,4,5,6,7,8,9,10,30,31], costs = [2,7,15]
+输出：17
+解释：
+例如，这里有一种购买通行证的方法，可以让你完成你的旅行计划： 
+在第 1 天，你花了 costs[2] = $15 买了一张为期 30 天的通行证，它将在第 1, 2, ..., 30 天生效。
+在第 31 天，你花了 costs[0] = $2 买了一张为期 1 天的通行证，它将在第 31 天生效。 
+你总共花了 $17，并完成了你计划的每一天旅行。
+
+```
+
+### 解题思路
+
+```
+每个点，都是其右侧1,7,30能达到最右边的dp值加上cost[0]cost[1]cost[2],这三个求最小
+```
+
+### tag
+
+DP
+
+### code
+
+```python
+from functools import lru_cache
+class Solution:
+    def mincostTickets(self, days, costs):
+        length = len(days)
+        durations = [1,7,30]
+
+        @lru_cache(None)
+        def dp(i):
+            if i>=length:
+                return 0
+            j = i
+            res = float("inf")
+            for c,d in zip(costs,durations):
+                while(j<length and days[j]<days[i]+d):
+                    j+=1
+                res = min(res,dp(j)+c)
+            return res
+        return dp(0)
+```
+
+## 5. Longest Palindromic Substring
+
+### 题目描述
+
+```
+Given a string s, find the longest palindromic substring in s. You may assume that the maximum length of s is 1000.
+
+Example 1:
+
+Input: "babad"
+Output: "bab"
+Note: "aba" is also a valid answer.
+```
+
+### 解题思路
+
+```
+每个点，遍历奇数还是偶数组合
+dp
+```
+
+### tag
+
+DP
+
+### code
+
+```python
+#DP version
+class Solution:
+    def longestPalindrome(self, s: str) -> str:
+        l = len(s)
+        dp = [[False]*l for _ in range(l)]
+        if l==0:
+            return ""
+        res = ""
+        for i in range(l-1,-1,-1):
+            for j in range(i,l):
+                dp[i][j] = ((s[i]==s[j]) and ((j-i<3) or dp[i+1][j-1]))
+                if dp[i][j] and (j-i+1)>len(res):
+                    res = s[i:j+1]
+        return res
+```
+
+
+
+```python
+class Solution:
+    def longestPalindrome(self, s: str) -> str:
+        res = ""
+        for i in range(len(s)):
+            temp = self.part(s,i,i)
+            if len(temp)>len(res):
+                res = temp
+            temp = self.part(s,i,i+1)
+            if len(temp)>len(res):
+                res = temp  
+        return res
+    
+    def part(self,s,i,j):
+        while(i>=0 and j<len(s)):
+            if s[i]==s[j]:
+                i-=1
+                j+=1
+            else:
+                break
+        return s[i+1:j]
+```
+
+## 19. Remove Nth Node From End of List
+
+### 题目描述
+
+```
+Given a string, find the length of the longest substring without repeating characters.
+
+Example 1:
+
+Input: "abcabcbb"
+Output: 3 
+Explanation: The answer is "abc", with the length of 3. 
+Example 2:
+
+Input: "bbbbb"
+Output: 1
+Explanation: The answer is "b", with the length of 1.
+Example 3:
+
+Input: "pwwkew"
+Output: 3
+Explanation: The answer is "wke", with the length of 3. 
+             Note that the answer must be a substring, "pwke" is a subsequence and not a substring.
+```
+
+### 解题思路
+
+```
+b先往后走n个字典存储当前出现字母最后一个index，看最后一个出现的在不在res[i-1]
+```
+
+### tag
+
+
+
+### code
+
+```python
+class Solution:
+    def lengthOfLongestSubstring(self, s: str) -> int:
+        dic = {}
+        if not s:
+            return 0
+        dic[s[0]] = 0
+        res = [1]*len(s)
+        for i,n in enumerate(s[1:]):
+            i = i+1
+            if n not in dic:
+                res[i]=res[i-1]+1
+                dic[n] = i
+            else:
+                temp = dic[n]
+                if temp>=i-res[i-1]:
+                    res[i] = i-temp
+                else:
+                    res[i] = res[i-1]+1
+                dic[n] = i
+        return max(res)
+```
+
+## 84. Largest Rectangle in Histogram
+
+### 题目描述
+
+```
+Given n non-negative integers representing the histogram's bar height where the width of each bar is 1, find the area of largest rectangle in the histogram.
+Example:
+Input: [2,1,5,6,2,3]
+Output: 10
+```
+
+### 解题思路
+
+```
+1.堆，堆里保持上升的序列和index，但是超时
+2.堆，堆里，从右往左，元素大于当前的元素时，就进行处理，比如，685,以8为高度的就为2-1的宽度，6为高度的就是2-0的长度，计算完面积后，排出，将index2添加入堆
+```
+
+### tag
+
+
+
+### code
+
+```python
+## 难
+def largestRectangleArea(height):
+    height.append(0)
+    stack = [-1]
+    ans = 0
+    for i in range(len(height)):
+        while height[i] < height[stack[-1]]:
+            h = height[stack.pop()]
+            w = i - stack[-1] - 1
+            ans = max(ans, h * w)
+        stack.append(i)
+    height.pop()
+    return ans
+```
+
+
+
+```python
+#超时
+from collections import deque
+class Solution(object):
+    def largestRectangleArea(self, heights):
+        """
+        :type heights: List[int]
+        :rtype: int
+        """
+        if not heights:
+            return 0
+        q = deque([[heights[0],0]])
+        res = heights[0]
+        for i in range(1,len(heights)):
+            l = len(q)
+            res = max(res,heights[i])
+            q.append([heights[i],i])
+            last = heights[i]
+            for j in range(l-1,-1,-1):
+                temp = q[j]
+                if temp[0]>=last:
+                    temp[0] = last
+                    q.pop()
+                    res=max(res,(i-temp[1]+1)*last)
+                else:
+                    # temp
+                    for z in range(j,-1,-1):
+                        temp = q[z]
+                        res=max(res,(i-temp[1]+1)*temp[0])
+                    break
+        return res
+```
+
+## 394. Decode String
+
+### 题目描述
+
+```
+s = "3[a]2[bc]", return "aaabcbc".
+s = "3[a2[c]]", return "accaccacc".
+s = "2[abc]3[cd]ef", return "abcabccdcdcdef".
+```
+
+### 解题思路
+
+```
+stack
+```
+
+### tag
+
+stack
+
+### code
+
+```python
+class Solution(object):
+    def decodeString(self, s):
+        stack = []
+        curNum = 0
+        curString = ''
+        for c in s:
+            if c == '[':
+                stack.append(curString)
+                stack.append(curNum)
+                curString = ''
+                curNum = 0
+            elif c == ']':
+                num = stack.pop()
+                prevString = stack.pop()
+                curString = prevString + num*curString
+            elif c.isdigit():
+                curNum = curNum*10 + int(c)
+            else:
+                curString += c
+        return curString
+```
+
+## 47. Permutations II
+
+### 题目描述
+
+```
+Given a collection of numbers that might contain duplicates, return all possible unique permutations.
+
+Example:
+
+Input: [1,1,2]
+Output:
+[
+  [1,1,2],
+  [1,2,1],
+  [2,1,1]
+]
+```
+
+### 解题思路
+
+```
+主要在去重，避免重复，1插入之前结果[0,1],[1,0]，对于[0,1]，第一次[1,0,1],1不等于index为0的0，所以可以插入，第二次[0,1,1]，因为1等于index为1的1，所以要break，否则就要重复，所以相当于插入在这个元素前面之后，判断是否这俩元素相等，如果相等，直接break
+```
+
+### tag
+
+
+
+### code
+
+```python
+class Solution:
+    def permuteUnique(self,nums):
+        ans = [[]]
+        for n in nums:
+            new_ans = []
+            for l in ans:
+                for i in range(len(l)+1):
+                    new_ans.append(l[:i]+[n]+l[i:])
+                    if i<len(l):
+                        print(l[i],n)
+                    if i<len(l) and l[i]==n: break
+            ans = new_ans
+        return ans
+```
+
+## 105. Construct Binary Tree from Preorder and Inorder Traversal
+
+### 题目描述
+
+```
+Given preorder and inorder traversal of a tree, construct the binary tree.
+
+Note:
+preorder = [3,9,20,15,7]
+inorder = [9,3,15,20,7]
+Return the following binary tree:
+
+    3
+   / \
+  9  20
+    /  \
+   15   7
+```
+
+### 解题思路
+
+```
+主要在去重，避免重复，1插入之前结果[0,1],[1,0]，对于[0,1]，第一次[1,0,1],1不等于index为0的0，所以可以插入，第二次[0,1,1]，因为1等于index为1的1，所以要break，否则就要重复，所以相当于插入在这个元素前面之后，判断是否这俩元素相等，如果相等，直接break
+```
+
+### tag
+
+tree
+
+### code
+
+```python
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution:
+    def buildTree(self, preorder: List[int], inorder: List[int]) -> TreeNode:
+        if 
+        v = preorder.pop(0)
+        index = 
+        root = TreeNode(v)
+        self.left = self.buildTree(preorder,inorder[:index])
+        self.right = self.buildTree(preorder,inorder[index+1:])
+```
+
+## 50. Pow(x, n)
+
+### 题目描述
+
+```
+Implement pow(x, n), which calculates x raised to the power n (xn).
+
+Example 1:
+
+Input: 2.00000, 10
+Output: 1024.00000
+```
+
+### 解题思路
+
+```
+递归，每次缩小成一半，偶数的话是一半的平方，奇数的话还得×a
+```
+
+### tag
+
+
+
+### code
+
+```python
+class Solution(object):
+    def myPow(self, a, b):
+        """
+        :type x: float
+        :type n: int
+        :rtype: float
+        """
+        if b==0:
+            return 1
+        if b<0:
+            return 1.0/self.myPow(a,-b)
+        half = self.myPow(a,b//2)
+        if b%2==0:
+            return half*half
+        else:
+            return half*half*a
+        
+```
+
+## 90. Subsets II
+
+### 题目描述
+
+```
+Given a collection of integers that might contain duplicates, nums, return all possible subsets (the power set).
+
+Input: [1,2,2]
+Output:
+[
+  [2],
+  [1],
+  [1,2,2],
+  [2,2],
+  [1,2],
+  []
+]
+```
+
+### 解题思路
+
+```
+先排序，随后的话，要看当前字母跟之前的是否一样，如果一样的话，只在之前字母增加的部分增加，其他的话要每个res里都增加
+```
+
+### tag
+
+
+
+### code
+
+```python
+class Solution(object):
+    def subsetsWithDup(self, S):
+        res = [[]]
+        S.sort()
+        for i in range(len(S)):
+            if i == 0 or S[i] != S[i - 1]:
+                l = len(res)
+            for j in range(len(res) - l, len(res)):
+                res.append(res[j] + [S[i]])
+        return res	
+```
+
+## 113.  path sum III
+
+### 题目描述
+
+```
+Given a binary tree and a sum, find all root-to-leaf paths where each path's sum equals the given sum.
+
+Note: A leaf is a node with no children.
+
+Example:
+
+Given the below binary tree and sum = 22,
+
+      5
+     / \
+    4   8
+   /   / \
+  11  13  4
+ /  \    / \
+7    2  5   1
+```
+
+### 解题思路
+
+```
+dfs
+```
+
+### tag
+
+
+
+### code
+
+```python
+class Solution:
+    def pathSum(self, root: TreeNode, sum: int) -> List[List[int]]:
+        res = []
+        if not root:
+            return res
+        self.dfs(root,[root.val],sum,res)
+        return res
+    def dfs(self,root,lis,target,res):
+        target -= root.val
+        if not root.left and not root.right:
+            if target == 0:
+                res.append(lis)
+            return
+        if root.left:
+            self.dfs(root.left,lis+[root.left.val],target,res)
+        if root.right: 
+            self.dfs(root.right,lis+[root.right.val],target,res)
+
+```
+
+## 106. Construct Binary Tree from Inorder and Postorder Traversal
+
+### 题目描述
+
+```
+Given inorder and postorder traversal of a tree, construct the binary tree.
+
+Note:
+You may assume that duplicates do not exist in the tree.
+
+For example, given
+
+inorder = [9,3,15,20,7]
+postorder = [9,15,7,20,3]
+```
+
+### 解题思路
+
+```
+
+```
+
+### tag
+
+tree
+
+### code
+
+```python
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def buildTree(self, inorder, postorder):
+        """
+        :type inorder: List[int]
+        :type postorder: List[int]
+        :rtype: TreeNode
+        """
+        order = {}
+        for i,n in enumerate(inorder):
+            order[n] = i
+        def part(l,r):
+            if l>r:return None
+            x = TreeNode(postorder.pop())
+            mid = order[x.val]
+            x.right = part(mid+1,r)
+            x.left = part(l,mid-1)
+            return x
+        return part(0,len(inorder)-1)
+```
+
+## 106. Construct Binary Tree from Inorder and Postorder Traversal
+
+### 题目描述
+
+```
+Given a triangle, find the minimum path sum from top to bottom. Each step you may move to adjacent numbers on the row below.
+
+For example, given the following triangle
+
+[
+     [2],
+    [3,4],
+   [6,5,7],
+  [4,1,8,3]
+]
+```
+
+### 解题思路
+
+```
+1.dfs
+```
+
+### tag
+
+dfs
+
+dp
+
+### code
+
+```python
+class Solution:
+    def minimumTotal(self, triangle):
+        if not triangle:
+            return 
+        res = [[0 for i in range(len(row))] for row in triangle]
+        res[0][0] = triangle[0][0]
+        for i in range(1, len(triangle)):
+            for j in range(len(triangle[i])):
+                if j == 0:
+                    res[i][j] = res[i-1][j] + triangle[i][j]
+                elif j == len(triangle[i])-1:
+                    res[i][j] = res[i-1][j-1] + triangle[i][j]
+                else:
+                    res[i][j] = min(res[i-1][j-1], res[i-1][j]) + triangle[i][j]
+        return min(res[-1])
+```
+
+
+
+```python
+## 超时
+class Solution:
+    def minimumTotal(self, triangle: List[List[int]]) -> int:
+        res = []
+        if not triangle:
+            return 0
+        self.dfs(triangle,1,0,triangle[0][0],res)
+        self.dfs(triangle,1,1,triangle[0][0],res)
+        return min(res)
+    def dfs(self,triangle,i,j,num,res):
+        if i>=len(triangle):
+            res.append(num)
+            return
+        if j<0 or j>=(i+1):
+            return 
+        self.dfs(triangle,i+1,j,num+triangle[i][j],res)
+        self.dfs(triangle,i+1,j+1,num+triangle[i][j],res)
+```
+
+## 137. 只出现一次的数字 II
+
+### 题目描述
+
+```
+给定一个非空整数数组，除了某个元素只出现一次以外，其余每个元素均出现了三次。找出那个只出现了一次的元素。
+
+说明：
+
+你的算法应该具有线性时间复杂度。 你可以不使用额外空间来实现吗？
+
+示例 1:
+
+输入: [2,2,3,2]
+输出: 3
+```
+
+### 解题思路
+
+```
+1.用set，所有都乘以三，减去之前的和，除以2就是剩下的一个那个
+```
+
+### tag
+
+bit
+
+dp
+
+### code
+
+```python
+class Solution:
+    def singleNumber(self, nums):
+        return (3 * sum(set(nums)) - sum(nums)) // 2
+
+
+```
+
+## 150. Evaluate Reverse Polish Notation
+
+### 题目描述
+
+```
+Input: ["2", "1", "+", "3", "*"]
+Output: 9
+Explanation: ((2 + 1) * 3) = 9
+```
+
+### 解题思路
+
+```
+
+栈，遇到符号，就把栈最后两个处理，随后结果推入栈
+```
+
+### tag
+
+stack
+
+### code
+
+```python
+def evalRPN(self, tokens):
+    stack = []
+    for t in tokens:
+        if t not in ["+","-","*","/"]:
+            stack.append(int(t))
+        else:
+            r,l = stack.pop(),stack.pop()
+            if t == "+":
+                stack.append(l+r)
+            elif t == "-":
+                stack.append(l-r)
+            elif t == "*":
+                stack.append(l*r)
+            else:
+                if l*r < 0 and l % r != 0:
+                    stack.append(l/r+1)
+                else:
+                    stack.append(l/r)
+    return stack[-1]
+```
+
+## 134. Gas Station
+
+### 题目描述
+
+```
+Input: 
+gas  = [1,2,3,4,5]
+cost = [3,4,5,1,2]
+
+Output: 3
+```
+
+### 解题思路
+
+```
+对于一个循环数组，如果这个数组整体和 >= 0，那么必然可以在数组中找到这么一个元素：从这个数组元素出发，绕数组一圈，能保证累加和一直是出于非负状态。
+循环数组分成两个必存在一个区间二分，使得{区间1的和}>0 且{区间1的和}>=abs{区间2的和}。
+```
+
+### tag
+
+
+
+### code
+
+```python
+class Solution(object):
+    def canCompleteCircuit(self, gas, cost):
+        """
+        :type gas: List[int]
+        :type cost: List[int]
+        :rtype: int
+        """
+        n = len(gas)
+        j = -1
+        s = 0
+        t = 0
+        for i in range(n):
+            t += (gas[i]-cost[i])
+            s += (gas[i]-cost[i])
+            if s <0:
+                s = 0
+                j=i
+        if t<0: return -1
+        return j+1
+        
+```
+
+## JD笔试题
+
+### 题目描述
+
+```
+最优打字策略
+```
+
+### 解题思路
+
+```
+dp
+```
+
+### tag
+
+dp
+
+### code
+
+```python
+def cal(s):
+    l = len(s)
+    dp = [[0]*l for _ in range(2)]
+    start = 0
+    for index,n in enumerate(s):
+        if ord(n)-ord('Z')<=0:
+            start = index
+            break
+    dp[0][start] = 1
+    dp[1][start] = 1
+    for j in range(start+1,l):
+        if ord(s[j])-ord('Z')<=0:
+            dp[0][j] = min(dp[0][j-1],dp[1][j-1]+1)
+            dp[1][j] = dp[1][j-1] + 1
+        else:
+            dp[0][j] = dp[0][j-1] + 1
+            dp[1][j] = min(dp[0][j-1]+1,dp[1][j-1])
+    print(dp)
+    return min(dp[0][-1],dp[1][-1])
+print(ord('B')-ord('A'))
+print(cal("AaAAAA"))
+```
+
+## 139.word break
+
+### 题目描述
+
+```
+Example 1:
+
+Input: s = "leetcode", wordDict = ["leet", "code"]
+Output: true
+Explanation: Return true because "leetcode" can be segmented as "leet code".
+Example 2:
+
+Input: s = "applepenapple", wordDict = ["apple", "pen"]
+Output: true
+Explanation: Return true because "applepenapple" can be segmented as "apple pen apple".
+             Note that you are allowed to reuse a dictionary word.
+```
+
+### 解题思路
+
+```
+dp
+```
+
+### tag
+
+dp
+
+### code
+
+```python
+class Solution(object):
+    def wordBreak(self, s, words):
+        df = [False]*(len(s)+1)
+        df[0] = True
+        for i in range(len(s)):
+            for w in words:
+                if i-len(w)+1>=0 and w==s[i-len(w)+1:i+1] and df[i-len(w)+1]:
+                    df[i+1] = True
+        return df[len(s)]                
+```
+
+## 139.word break
+
+### 题目描述
+
+```
+Given a binary tree, return the sum of values of its deepest leaves.
+```
+
+### 解题思路
+
+```
+BFS
+```
+
+### tag
+
+BFS
+
+### code
+
+```python
+#
+# @lc app=leetcode id=1302 lang=python3
+#
+# [1302] Deepest Leaves Sum
+#
+
+# @lc code=start
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+from collections import deque
+class Solution:
+    def deepestLeavesSum(self, root: TreeNode) -> int:
+        if not root:
+            return 0
+        cur = root.val
+        q = deque([root])
+        while(q):
+            new = 0
+            l = len(q)
+            for i in range(l):
+                node = q.popleft()
+                if node.left:
+                    q.append(node.left)
+                    new += node.left.val
+                if node.right:
+                    q.append(node.right)
+                    new += node.right.val
+            if new!=0:
+                cur = new
+        return cur
+# @lc code=end
+```
+
+## 面试题60. n个骰子的点数
+
+### 题目描述
+
+```
+把n个骰子扔在地上，所有骰子朝上一面的点数之和为s。输入n，打印出s的所有可能的值出现的概率。
+```
+
+### 解题思路
+
+```
+DP , 每个此轮的总数，都是-1到-6的上层的总和
+```
+
+### tag
+
+DP
+
+### code
+
+```java
+class Solution {//找规律：s共有 6^n种情况，共有5*n+1种不重复结果
+    public double[] twoSum(int n) {
+        //思路二：动态规划（人人为我）
+        /*
+            子问题：
+            状态：二维表 dp[n][6*n]：第n个筛子的“当前和”的出现次数
+            转移方程：dp[n][j]=dp[n][j-1]+dp[n][j-2]+...+dp[n][j-6]
+        */
+        int[][] dp=new int[n][6*n];
+        for(int j=0; j<6; ++j){dp[0][j]=1;} //初始状态
+        for(int i=1; i<n; ++i){ //处理行
+            for(int j=i; j<(i+1)*6; ++j){
+                for(int dice=1; dice<7; ++dice){
+                    if(j-dice < 0){break;}
+                    dp[i][j]+=dp[i-1][j-dice];
+                }
+            }
+        }
+        double[] res=new double[5*n+1];
+        int j=n-1;
+        for(int i=0; i<res.length; ++i){
+            res[i]=dp[n-1][j++]/Math.pow(6, n);
+        }
+        return res;
+    }
+}
+
+```
+
+## 278.first bad version
+
+### 题目描述
+
+```
+Given n = 5, and version = 4 is the first bad version.
+
+call isBadVersion(3) -> false
+call isBadVersion(5) -> true
+call isBadVersion(4) -> true
+
+Then 4 is the first bad version. 
+```
+
+### 解题思路
+
+```
+binary search
+```
+
+### tag
+
+binary search
+
+### code
+
+```python
+class Solution(object):
+    def firstBadVersion(self, n):
+        """
+        :type n: int
+        :rtype: int
+        """
+        r = n-1
+        l = 0
+        while(l<=r):
+            mid = l + (r-l)/2
+            if isBadVersion(mid)==False:
+                l = mid+1
+            else:
+                r = mid-1
+        return l
+```
+
+## 279.Perfect Squares
+
+### 题目描述
+
+```
+iven a positive integer n, find the least number of perfect square numbers (for example, 1, 4, 9, 16, ...) which sum to n.
+
+Example 1:
+
+Input: n = 12
+Output: 3 
+Explanation: 12 = 4 + 4 + 4.
+```
+
+### 解题思路
+
+```
+dp
+```
+
+### tag
+
+binary search
+
+### code
+
+```python
+class Solution(object):
+    _dp = [0]
+    def numSquares(self, n):
+        dp = self._dp
+        while len(dp) <= n:
+            dp += min(dp[-i*i] for i in range(1, int(len(dp)**0.5+1))) + 1,
+        return dp[n]
+```
+
+
+
+## 896. Monotonic Array
+
+### 题目描述
+
+```
+An array is monotonic if it is either monotone increasing or monotone decreasing.
+
+An array A is monotone increasing if for all i <= j, A[i] <= A[j].  An array A is monotone decreasing if for all i <= j, A[i] >= A[j].
+
+Return true if and only if the given array A is monotonic.
+```
+
+### 解题思路
+
+```
+如果为false，总要下降上升都会经历
+```
+
+### tag
+
+
+
+### code
+
+```python
+class Solution(object):
+    def isMonotonic(self, A):
+        """
+        :type A: List[int]
+        :rtype: bool
+        """
+
+        n = len(A)
+        if n <= 2: return True
+				
+        isGreat = False
+        isLess = False
+        for i in range(1, n):
+            if A[i - 1] > A[i]:
+                isGreat = True
+            if A[i - 1] < A[i]:
+                isLess = True
+
+            if isGreat and isLess:
+                return False
+
+        return True
+```
+
+
+
+## 13. Roman to Integer
+
+### 题目描述
+
+```
+Roman numerals are represented by seven different symbols: I, V, X, L, C, D and M.
+```
+
+### 解题思路
+
+```
+判断小于还是大于，小于的话减掉，大于的话加
+```
+
+### tag
+
+
+
+### code
+
+```python
+class Solution:
+# @param {string} s
+# @return {integer}
+def romanToInt(self, s):
+    roman = {'M': 1000,'D': 500 ,'C': 100,'L': 50,'X': 10,'V': 5,'I': 1}
+    z = 0
+    for i in range(0, len(s) - 1):
+        if roman[s[i]] < roman[s[i+1]]:
+            z -= roman[s[i]]
+        else:
+            z += roman[s[i]]
+    return z + roman[s[-1]]
+```
+
+## 6. ZigZag Conversion
+
+### 题目描述
+
+```
+The string "PAYPALISHIRING" is written in a zigzag pattern on a given number of rows like this: (you may want to display this pattern in a fixed font for better legibility)
+
+P   A   H   N
+A P L S I I G
+Y   I   R
+```
+
+### 解题思路
+
+```
+找规律，分第一行最后一行和中间这些行
+```
+
+### tag
+
+
+
+### code
+
+```python
+class Solution:
+    def convert(self,s,numRows):
+        if len(s) == 1 or numRows==1:
+            return s
+        l = len(s)
+        part = 2*numRows - 2
+        res = ""
+        for i in range(numRows):
+            if i == 0 or i == (numRows - 1):
+                temp = i
+                while(temp<l):
+                    res += s[temp]
+                    temp+=part
+            else:
+                temp = i
+                while(temp<l):
+                    res += s[temp]
+                    if temp+part -i*2<l:
+                        res += s[temp+part -i*2]
+                    else:
+                        break
+                    temp+=part
+        return res
+```
+
+## 88. Merge Sorted Array
+
+### 题目描述
+
+```
+Given two sorted integer arrays nums1 and nums2, merge nums2 into nums1 as one sorted array.
+```
+
+### 解题思路
+
+```
+O(1)复杂度，从后往前，分别对比，填入数组
+```
+
+### tag
+
+
+
+### code
+
+```python
+class Solution:
+    def merge(self, nums1: List[int], m: int, nums2: List[int], n: int) -> None:
+        """
+        Do not return anything, modify nums1 in-place instead.
+        """
+        if len(nums2) == 0:
+            return
+        p,p1,p2 = len(nums1)-1,len(nums1)-len(nums2)-1,len(nums2)-1
+        while (p1>=0 and p2>=0):
+            if nums1[p1] < nums2[p2]:
+                nums1[p] = nums2[p2]
+                p2 -= 1
+                p -= 1
+            else:
+                nums1[p] = nums1[p1]
+                p1 -= 1
+                p -= 1
+        if p1>=0:
+            tt = 1
+        elif p2>=0:
+            nums1[0:p+1] = nums2[0:p2+1]
+```
+
+## 773. 滑动谜题
+
+### 题目描述
+
+```
+在一个 2 x 3 的板上（board）有 5 块砖瓦，用数字 1~5 来表示, 以及一块空缺用 0 来表示.
+
+一次移动定义为选择 0 与一个相邻的数字（上下左右）进行交换.
+
+最终当板 board 的结果是 [[1,2,3],[4,5,0]] 谜板被解开。
+
+给出一个谜板的初始状态，返回最少可以通过多少次移动解开谜板，如果不能解开谜板，则返回 -1 。
+```
+
+### 解题思路
+
+```
+BFS,每次移动0的位置，上下左右都可以移动，广度优先第一个return的会是最小的step
+```
+
+### tag
+
+BFS
+
+### code
+
+```python
+class Solution:
+    def slidingPuzzle(self, board: List[List[int]]) -> int:
+        s = ''.join(str(d) for row in board for d in row)
+        dp ,seen = collections.deque(),{s}
+        dp.append((s,s.index("0")))
+        steps,height,width = 0,len(board),len(board[0])
+        while(dp):
+            for _ in range(len(dp)):
+                tt,index = dp.popleft()
+                if tt == "123450":
+                    return steps
+                x,y = index//width,index%width
+                for r,c in (x,y+1),(x+1,y),(x,y-1),(x-1,y):
+                    if height>r>=0<=c<width:
+                        ch = [d for d in tt]
+                        ch[index],ch[r*width+c] = ch[r*width+c],ch[index]
+                        s = ''.join(ch)
+                        if s not in seen:
+                            seen.add(s)
+                            dp.append((s,r*width+c))
+            steps += 1
+        return -1
+```
 
 
 
